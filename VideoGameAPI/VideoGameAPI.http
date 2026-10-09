@@ -1,0 +1,11 @@
+@VideoGameAPI_HostAddress = http://localhost:5226
+
+GET {{VideoGameAPI_HostAddress}}/todos/
+Accept: application/json
+
+###
+
+GET {{VideoGameAPI_HostAddress}}/todos/1
+Accept: application/json
+
+###
