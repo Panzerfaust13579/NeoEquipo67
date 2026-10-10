@@ -1,0 +1,88 @@
+@inject NavigationManager Navigation
+
+<div class="fiori-card detail-panel">
+    @if (Videojuego == null)
+    {
+        <div class="fiori-empty-state">
+            <div style="font-size: 32px; margin-bottom: 8px;">🎮</div>
+            <h3>Ningún videojuego seleccionado</h3>
+            <p>Selecciona un elemento de la lista para consultar su detalle y reseñas asociadas.</p>
+        </div>
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(Videojuego.ImagenUrl))
+        {
+            <img src="@Videojuego.ImagenUrl" alt="@Videojuego.Nombre" class="detail-image" />
+        }
+
+        <h2 class="detail-title">@Videojuego.Nombre</h2>
+
+        <div class="master-item-meta" style="margin-bottom: 12px;">
+            <span class="chip-neutral">@Videojuego.Categoria</span>
+
+            @if (Videojuego.TotalResenas > 0)
+            {
+                var cal = Videojuego.CalificacionPromedio;
+                var chipClass = cal >= 4.0 ? "chip-positive" : cal >= 3.0 ? "chip-critical" : "chip-negative";
+                <span class="@chipClass">★ @cal.ToString("0.0") (@Videojuego.TotalResenas)</span>
+            }
+            else
+            {
+                <span class="chip-neutral">Sin reseñas</span>
+            }
+
+            <span class="master-item-price" style="margin: 0; font-size: 16px;">
+                $@Videojuego.Precio.ToString("0.00")
+            </span>
+        </div>
+
+        <p class="detail-desc">@Videojuego.Descripcion</p>
+
+        <div style="margin-bottom: 18px;">
+            <button class="btn-emphasized" @onclick="VerDetalleCompleto">
+                Ver detalle completo
+            </button>
+        </div>
+
+        <h4 style="margin: 16px 0 8px 0; border-top: 1px solid var(--sapCardBorderColor); padding-top: 14px;">
+            Reseñas (@Videojuego.TotalResenas)
+        </h4>
+
+        @if (Videojuego.Resenas != null && Videojuego.Resenas.Any())
+        {
+            <div class="review-list">
+                @foreach (var resena in Videojuego.Resenas)
+                {
+                    var resenaChip = resena.Calificacion >= 4 ? "chip-positive" : resena.Calificacion == 3 ? "chip-critical" : "chip-negative";
+                    <div class="review-card">
+                        <div class="review-header">
+                            <span class="review-author">@resena.Autor</span>
+                            <span class="@resenaChip">★ @resena.Calificacion/5</span>
+                        </div>
+                        <p class="review-comment">@resena.Comentario</p>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p style="color: var(--sapNeutralColor); font-style: italic;">
+                Este videojuego aún no cuenta con reseñas registradas.
+            </p>
+        }
+    }
+</div>
+
+@code {
+    [CascadingParameter(Name = "VideojuegoSeleccionado")]
+    public VideojuegoDto? Videojuego { get; set; }
+
+    private void VerDetalleCompleto()
+    {
+        if (Videojuego != null)
+        {
+            Navigation.NavigateTo($"/videojuego/{Videojuego.Id}");
+        }
+    }
+}

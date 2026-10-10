@@ -1,0 +1,234 @@
+@page "/videojuego/{Id:int}"
+@inject IVideojuegoService VideojuegoService
+@inject NavigationManager Navigation
+
+<div class="fiori-page">
+    <div class="fiori-header-bar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn-transparent" @onclick="Volver">
+                ← Volver al catálogo
+            </button>
+            <h1 class="fiori-header-title">Detalle del Videojuego</h1>
+        </div>
+        <div>
+            <button class="btn-default" @onclick="CargarDetalle">
+                Actualizar
+            </button>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="fiori-message-strip negative">
+            <span>⚠</span>
+            <span>@mensajeError</span>
+            <button class="btn-transparent" style="margin-left: auto;" @onclick="Volver">
+                Volver
+            </button>
+        </div>
+    }
+
+    @if (cargando)
+    {
+        <div class="fiori-card fiori-empty-state">
+            <div class="fiori-loading-spinner"></div>
+            <p style="margin-top: 14px;">Cargando información del videojuego...</p>
+        </div>
+    }
+    else if (videojuego == null)
+    {
+        <div class="fiori-card fiori-empty-state">
+            <h3>Videojuego no encontrado</h3>
+            <p>No se encontró ningún videojuego con el ID @Id.</p>
+            <button class="btn-emphasized" @onclick="Volver">
+                Volver al catálogo
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="fiori-card">
+            <div style="display: grid; grid-template-columns: minmax(280px, 400px) 1fr; gap: 24px; align-items: start;">
+                <div>
+                    <img src="@(string.IsNullOrWhiteSpace(videojuego.ImagenUrl) ? "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600" : videojuego.ImagenUrl)"
+                         alt="@videojuego.Nombre"
+                         style="width: 100%; border-radius: 6px; border: 1px solid var(--sapCardBorderColor); object-fit: cover; max-height: 380px;" />
+                </div>
+                <div>
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
+                        <span class="chip-neutral">@videojuego.Categoria</span>
+                        <span class="chip-neutral">ID: @videojuego.Id</span>
+                        @if (videojuego.TotalResenas > 0)
+                        {
+                            var cal = videojuego.CalificacionPromedio;
+                            var chipClass = cal >= 4.0 ? "chip-positive" : cal >= 3.0 ? "chip-critical" : "chip-negative";
+                            <span class="@chipClass">★ @cal.ToString("0.0") (@videojuego.TotalResenas reseñas)</span>
+                        }
+                    </div>
+
+                    <h2 style="font-size: 26px; font-weight: 700; margin: 0 0 12px 0;">@videojuego.Nombre</h2>
+                    <div class="master-item-price" style="font-size: 22px; margin-bottom: 16px;">
+                        $@videojuego.Precio.ToString("0.00")
+                    </div>
+
+                    <h4 style="margin: 16px 0 6px 0;">Descripción</h4>
+                    <p style="font-size: 15px; line-height: 1.7; color: var(--sapTextColor);">
+                        @videojuego.Descripcion
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Reseñas y Formulario para agregar una reseña -->
+        <div class="fiori-card">
+            <h3 style="margin-top: 0; margin-bottom: 16px; border-bottom: 1px solid var(--sapCardBorderColor); padding-bottom: 10px;">
+                Reseñas de Usuarios (@videojuego.TotalResenas)
+            </h3>
+
+            @if (videojuego.Resenas != null && videojuego.Resenas.Any())
+            {
+                <div class="review-list">
+                    @foreach (var resena in videojuego.Resenas)
+                    {
+                        var resenaChip = resena.Calificacion >= 4 ? "chip-positive" : resena.Calificacion == 3 ? "chip-critical" : "chip-negative";
+                        <div class="review-card">
+                            <div class="review-header">
+                                <span class="review-author" style="font-size: 14px;">@resena.Autor</span>
+                                <span class="@resenaChip">★ @resena.Calificacion / 5</span>
+                            </div>
+                            <p class="review-comment">@resena.Comentario</p>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p style="color: var(--sapNeutralColor); font-style: italic;">
+                    Aún no hay reseñas registradas para este videojuego.
+                </p>
+            }
+
+            <!-- Formulario Rápido para añadir reseña -->
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--sapCardBorderColor);">
+                <h4 style="margin: 0 0 12px 0;">Agregar una nueva reseña</h4>
+
+                @if (!string.IsNullOrEmpty(mensajeResenaExito))
+                {
+                    <div class="fiori-message-strip positive">
+                        <span>✔</span>
+                        <span>@mensajeResenaExito</span>
+                    </div>
+                }
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div>
+                        <label class="fiori-form-label">Tu Nombre:</label>
+                        <input class="fiori-form-control" @bind="nuevaResenaAutor" placeholder="Ej. Juan Pérez" />
+                    </div>
+                    <div>
+                        <label class="fiori-form-label">Calificación (1 a 5):</label>
+                        <select class="fiori-form-control" @bind="nuevaResenaCalificacion">
+                            <option value="5">5 - Excelente</option>
+                            <option value="4">4 - Muy bueno</option>
+                            <option value="3">3 - Regular</option>
+                            <option value="2">2 - Malo</option>
+                            <option value="1">1 - Pésimo</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label class="fiori-form-label">Comentario:</label>
+                    <textarea class="fiori-form-control" rows="2" @bind="nuevaResenaComentario" placeholder="Escribe tu opinión..."></textarea>
+                </div>
+                <button class="btn-positive" @onclick="GuardarResena" disabled="@guardandoResena">
+                    @(guardandoResena ? "Guardando..." : "Publicar Reseña")
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private VideojuegoDto? videojuego;
+    private bool cargando = true;
+    private string? mensajeError;
+
+    private string nuevaResenaAutor = string.Empty;
+    private int nuevaResenaCalificacion = 5;
+    private string nuevaResenaComentario = string.Empty;
+    private bool guardandoResena = false;
+    private string? mensajeResenaExito;
+
+    // Se cargan los datos en OnParametersSetAsync según el requerimiento explícito
+    protected override async Task OnParametersSetAsync()
+    {
+        await CargarDetalle();
+    }
+
+    private async Task CargarDetalle()
+    {
+        cargando = true;
+        mensajeError = null;
+
+        try
+        {
+            videojuego = await VideojuegoService.GetVideojuegoAsync(Id);
+            if (videojuego == null)
+            {
+                mensajeError = $"No se encontró el videojuego con ID {Id}.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al consultar el videojuego: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private async Task GuardarResena()
+    {
+        if (string.IsNullOrWhiteSpace(nuevaResenaAutor) || string.IsNullOrWhiteSpace(nuevaResenaComentario))
+        {
+            return;
+        }
+
+        guardandoResena = true;
+        mensajeResenaExito = null;
+
+        try
+        {
+            var resena = new ResenaDto
+            {
+                VideojuegoId = Id,
+                Autor = nuevaResenaAutor,
+                Calificacion = nuevaResenaCalificacion,
+                Comentario = nuevaResenaComentario
+            };
+
+            await VideojuegoService.CrearResenaAsync(resena);
+            nuevaResenaAutor = string.Empty;
+            nuevaResenaComentario = string.Empty;
+            mensajeResenaExito = "¡Reseña registrada con éxito!";
+            await CargarDetalle();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al registrar reseña: {ex.Message}";
+        }
+        finally
+        {
+            guardandoResena = false;
+        }
+    }
+
+    private void Volver()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

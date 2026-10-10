@@ -1,0 +1,505 @@
+:root {
+    --sapBackgroundColor: #F5F6F7;
+    --sapShellColor: #354A5F;
+    --sapBrandColor: #0A6ED1;
+    --sapTextColor: #32363A;
+    --sapPositiveColor: #107E3E;
+    --sapNegativeColor: #BB0000;
+    --sapCriticalColor: #E9730C;
+    --sapNeutralColor: #6A6D70;
+    --sapFontFamily: "72", "72full", Arial, Helvetica, sans-serif;
+    --sapWhite: #FFFFFF;
+    --sapCardBorderColor: #D9DADC;
+    --sapHoverColor: #EBF3FC;
+    --sapSelectedColor: #E5F0FA;
+    --sapPositiveBgColor: #E7F6EC;
+    --sapCriticalBgColor: #FEF3EB;
+    --sapNegativeBgColor: #FDEDED;
+    --sapNeutralBgColor: #EDEDEE;
+    --sapShadowColor: rgba(0, 0, 0, 0.08);
+    --sapTransparent: transparent;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    background-color: var(--sapBackgroundColor);
+    color: var(--sapTextColor);
+    font-family: var(--sapFontFamily);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Shell Bar */
+.fiori-shellbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: var(--sapShellColor);
+    color: var(--sapWhite);
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-shadow: 0 2px 4px var(--sapShadowColor);
+}
+
+.fiori-shellbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.fiori-shellbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--sapWhite);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.fiori-shellbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Tipos de Botón SAP Fiori */
+.btn-emphasized {
+    background-color: var(--sapBrandColor);
+    color: var(--sapWhite);
+    border: 1px solid var(--sapBrandColor);
+    border-radius: 4px;
+    padding: 7px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: filter 0.2s;
+}
+
+.btn-emphasized:hover {
+    filter: brightness(0.9);
+}
+
+.btn-default {
+    background-color: var(--sapWhite);
+    color: var(--sapBrandColor);
+    border: 1px solid var(--sapBrandColor);
+    border-radius: 4px;
+    padding: 7px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background-color 0.2s;
+}
+
+.btn-default:hover {
+    background-color: var(--sapHoverColor);
+}
+
+.btn-transparent {
+    background-color: var(--sapTransparent);
+    color: var(--sapBrandColor);
+    border: 1px solid var(--sapTransparent);
+    border-radius: 4px;
+    padding: 7px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background-color 0.2s;
+}
+
+.btn-transparent:hover {
+    background-color: var(--sapNeutralBgColor);
+}
+
+.btn-negative {
+    background-color: var(--sapNegativeColor);
+    color: var(--sapWhite);
+    border: 1px solid var(--sapNegativeColor);
+    border-radius: 4px;
+    padding: 7px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-positive {
+    background-color: var(--sapPositiveColor);
+    color: var(--sapWhite);
+    border: 1px solid var(--sapPositiveColor);
+    border-radius: 4px;
+    padding: 7px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* Chips de Estado (Object Status) */
+.chip-neutral {
+    background-color: var(--sapNeutralBgColor);
+    color: var(--sapNeutralColor);
+    border: 1px solid var(--sapNeutralColor);
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.chip-positive {
+    background-color: var(--sapPositiveBgColor);
+    color: var(--sapPositiveColor);
+    border: 1px solid var(--sapPositiveColor);
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.chip-critical {
+    background-color: var(--sapCriticalBgColor);
+    color: var(--sapCriticalColor);
+    border: 1px solid var(--sapCriticalColor);
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.chip-negative {
+    background-color: var(--sapNegativeBgColor);
+    color: var(--sapNegativeColor);
+    border: 1px solid var(--sapNegativeColor);
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Tarjetas y Contenedores Fiori */
+.fiori-page {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.fiori-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.fiori-header-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--sapTextColor);
+}
+
+.fiori-card {
+    background-color: var(--sapWhite);
+    border: 1px solid var(--sapCardBorderColor);
+    border-radius: 6px;
+    box-shadow: 0 1px 3px var(--sapShadowColor);
+    padding: 18px;
+    margin-bottom: 14px;
+}
+
+.fiori-card-interactive {
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.fiori-card-interactive:hover {
+    border-color: var(--sapBrandColor);
+    background-color: var(--sapHoverColor);
+}
+
+.fiori-card-interactive.selected {
+    border-color: var(--sapBrandColor);
+    background-color: var(--sapSelectedColor);
+    box-shadow: 0 0 0 2px var(--sapBrandColor);
+}
+
+/* Master - Detail Layout */
+.master-detail-container {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .master-detail-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.master-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.master-item {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.master-item-image {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--sapCardBorderColor);
+    background-color: var(--sapNeutralBgColor);
+    flex-shrink: 0;
+}
+
+.master-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.master-item-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    color: var(--sapTextColor);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.master-item-price {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--sapBrandColor);
+    margin: 0 0 6px 0;
+}
+
+.master-item-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Detalle Panel */
+.detail-panel {
+    position: sticky;
+    top: 68px;
+}
+
+.detail-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    border: 1px solid var(--sapCardBorderColor);
+}
+
+.detail-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: var(--sapTextColor);
+}
+
+.detail-desc {
+    color: var(--sapTextColor);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 12px 0;
+}
+
+/* Lista de Reseñas */
+.review-list {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.review-card {
+    background-color: var(--sapBackgroundColor);
+    border: 1px solid var(--sapCardBorderColor);
+    border-radius: 4px;
+    padding: 12px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.review-author {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--sapTextColor);
+}
+
+.review-comment {
+    font-size: 13px;
+    color: var(--sapTextColor);
+    margin: 0;
+}
+
+/* Mensajes de Estado Fiori (MessageStrip) */
+.fiori-message-strip {
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.fiori-message-strip.positive {
+    background-color: var(--sapPositiveBgColor);
+    color: var(--sapPositiveColor);
+    border-left: 4px solid var(--sapPositiveColor);
+}
+
+.fiori-message-strip.negative {
+    background-color: var(--sapNegativeBgColor);
+    color: var(--sapNegativeColor);
+    border-left: 4px solid var(--sapNegativeColor);
+}
+
+.fiori-message-strip.critical {
+    background-color: var(--sapCriticalBgColor);
+    color: var(--sapCriticalColor);
+    border-left: 4px solid var(--sapCriticalColor);
+}
+
+/* Formularios Fiori */
+.fiori-form-group {
+    margin-bottom: 16px;
+}
+
+.fiori-form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sapTextColor);
+    margin-bottom: 6px;
+}
+
+.fiori-form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--sapCardBorderColor);
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: var(--sapFontFamily);
+    color: var(--sapTextColor);
+    background-color: var(--sapWhite);
+    transition: border-color 0.2s;
+}
+
+.fiori-form-control:focus {
+    outline: none;
+    border-color: var(--sapBrandColor);
+    box-shadow: 0 0 0 1px var(--sapBrandColor);
+}
+
+.fiori-validation-message {
+    color: var(--sapNegativeColor);
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+    font-weight: 500;
+}
+
+/* Filtro de Búsqueda */
+.fiori-search-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.fiori-filter-select {
+    padding: 7px 12px;
+    border: 1px solid var(--sapCardBorderColor);
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: var(--sapWhite);
+    color: var(--sapTextColor);
+}
+
+/* Empty State / Loading State */
+.fiori-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--sapNeutralColor);
+}
+
+.fiori-loading-spinner {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--sapNeutralBgColor);
+    border-radius: 50%;
+    border-top-color: var(--sapBrandColor);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

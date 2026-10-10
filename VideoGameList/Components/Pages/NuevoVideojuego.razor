@@ -1,0 +1,134 @@
+@page "/videojuego/nuevo"
+@inject IVideojuegoService VideojuegoService
+@inject NavigationManager Navigation
+
+<div class="fiori-page" style="max-width: 800px;">
+    <div class="fiori-header-bar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn-transparent" @onclick="Cancelar">
+                ← Volver
+            </button>
+            <h1 class="fiori-header-title">Crear Nuevo Videojuego</h1>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(mensajeConfirmacion))
+    {
+        <div class="fiori-message-strip positive">
+            <span>✔</span>
+            <span>@mensajeConfirmacion</span>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="fiori-message-strip negative">
+            <span>⚠</span>
+            <span>@mensajeError</span>
+        </div>
+    }
+
+    <div class="fiori-card">
+        <EditForm Model="modelo" OnValidSubmit="Guardar">
+            <DataAnnotationsValidator />
+
+            <div class="fiori-form-group">
+                <label class="fiori-form-label">Nombre del Videojuego *</label>
+                <InputText class="fiori-form-control" @bind-Value="modelo.Nombre" placeholder="Ej. Metroid Dread" />
+                <ValidationMessage For="@(() => modelo.Nombre)" class="fiori-validation-message" />
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="fiori-form-group">
+                    <label class="fiori-form-label">Precio ($ USD) *</label>
+                    <InputNumber class="fiori-form-control" @bind-Value="modelo.Precio" step="0.01" />
+                    <ValidationMessage For="@(() => modelo.Precio)" class="fiori-validation-message" />
+                </div>
+
+                <div class="fiori-form-group">
+                    <label class="fiori-form-label">Categoría *</label>
+                    <InputSelect class="fiori-form-control" @bind-Value="modelo.Categoria">
+                        <option value="">-- Selecciona una categoría --</option>
+                        <option value="RPG">RPG</option>
+                        <option value="Aventura">Aventura</option>
+                        <option value="Metroidvania">Metroidvania</option>
+                        <option value="Plataformas">Plataformas</option>
+                        <option value="Carreras">Carreras</option>
+                        <option value="Roguelike">Roguelike</option>
+                        <option value="Estrategia">Estrategia</option>
+                        <option value="Acción">Acción</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => modelo.Categoria)" class="fiori-validation-message" />
+                </div>
+            </div>
+
+            <div class="fiori-form-group">
+                <label class="fiori-form-label">URL de la Portada / Imagen</label>
+                <InputText class="fiori-form-control" @bind-Value="modelo.ImagenUrl" placeholder="https://ejemplo.com/portada.jpg" />
+                <ValidationMessage For="@(() => modelo.ImagenUrl)" class="fiori-validation-message" />
+            </div>
+
+            <div class="fiori-form-group">
+                <label class="fiori-form-label">Descripción</label>
+                <InputTextArea class="fiori-form-control" rows="4" @bind-Value="modelo.Descripcion" placeholder="Describe brevemente la trama, jugabilidad y características del videojuego..." />
+                <ValidationMessage For="@(() => modelo.Descripcion)" class="fiori-validation-message" />
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; border-top: 1px solid var(--sapCardBorderColor); padding-top: 16px;">
+                <button type="button" class="btn-transparent" @onclick="Cancelar" disabled="@guardando">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-emphasized" disabled="@guardando">
+                    @(guardando ? "Guardando en OData..." : "Guardar Videojuego")
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private VideojuegoDto modelo = new()
+    {
+        Nombre = string.Empty,
+        Categoria = string.Empty,
+        Precio = 29.99m,
+        Descripcion = string.Empty,
+        ImagenUrl = "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600"
+    };
+
+    private bool guardando = false;
+    private string? mensajeConfirmacion;
+    private string? mensajeError;
+
+    private async Task Guardar()
+    {
+        guardando = true;
+        mensajeError = null;
+        mensajeConfirmacion = null;
+
+        try
+        {
+            var resultado = await VideojuegoService.CrearVideojuegoAsync(modelo);
+            if (resultado != null)
+            {
+                mensajeConfirmacion = $"¡Videojuego '{resultado.Nombre}' creado exitosamente mediante OData POST! Redirigiendo...";
+                StateHasChanged();
+                await Task.Delay(1400);
+                Navigation.NavigateTo("/");
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al registrar el videojuego en el servicio OData: {ex.Message}";
+        }
+        finally
+        {
+            guardando = false;
+        }
+    }
+
+    private void Cancelar()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

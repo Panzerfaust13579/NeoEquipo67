@@ -1,48 +1,77 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.OData;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OData.ModelBuilder;
+using VideoGameAPI.Data;
+using VideoGameAPI.Models;
 
-var builder = WebApplication.CreateSlimBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.ConfigureHttpJsonOptions(options =>
+// Configuración de SQLite en memoria persistente durante la vida de la app
+var sqliteConnection = new SqliteConnection("DataSource=:memory:");
+sqliteConnection.Open();
+builder.Services.AddSingleton(sqliteConnection);
+
+builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 {
-    options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
+    var connection = serviceProvider.GetRequiredService<SqliteConnection>();
+    options.UseSqlite(connection);
 });
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Configuración de CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// Modelo EDM para OData
+var modelBuilder = new ODataConventionModelBuilder();
+modelBuilder.EntitySet<Videojuego>("Videojuegos");
+modelBuilder.EntitySet<Resena>("Resenas");
+var edmModel = modelBuilder.GetEdmModel();
+
+// Configuración de Controllers y OData
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    })
+    .AddOData(options =>
+    {
+        options.Select()
+               .Filter()
+               .Expand()
+               .OrderBy()
+               .Count()
+               .SetMaxTop(100)
+               .AddRouteComponents("odata", edmModel);
+    });
+
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// Inicialización de la base de datos y semilla de datos
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    context.Database.EnsureCreated();
+    SeedData.Initialize(context);
+}
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-Todo[] sampleTodos =
-[
-    new(1, "Walk the dog"),
-    new(2, "Do the dishes", DateOnly.FromDateTime(DateTime.Now)),
-    new(3, "Do the laundry", DateOnly.FromDateTime(DateTime.Now.AddDays(1))),
-    new(4, "Clean the bathroom"),
-    new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
-];
-
-var todosApi = app.MapGroup("/todos");
-todosApi.MapGet("/", () => sampleTodos)
-        .WithName("GetTodos");
-
-todosApi.MapGet("/{id}", Results<Ok<Todo>, NotFound> (int id) =>
-    sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
-        ? TypedResults.Ok(todo)
-        : TypedResults.NotFound())
-    .WithName("GetTodoById");
+app.UseCors();
+app.UseRouting();
+app.MapControllers();
 
 app.Run();
-
-public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplete = false);
-
-[JsonSerializable(typeof(Todo[]))]
-internal partial class AppJsonSerializerContext : JsonSerializerContext
-{
-
-}

@@ -1,17 +1,27 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+<div class="fiori-app">
+    <!-- Shell Bar fijo arriba en el layout principal -->
+    <header class="fiori-shellbar">
+        <div class="fiori-shellbar-left">
+            <a class="fiori-shellbar-logo" href="">
+                <span>VideoGame API - SAP Fiori</span>
+            </a>
+            <NavLink class="btn-transparent" href="" Match="NavLinkMatch.All" style="color: var(--sapWhite);">
+                Inicio
+            </NavLink>
+            <NavLink class="btn-transparent" href="videojuego/nuevo" style="color: var(--sapWhite);">
+                Nuevo Videojuego
+            </NavLink>
         </div>
+        <div class="fiori-shellbar-actions">
+            <span class="chip-neutral">
+                Fiori Launchpad
+            </span>
+        </div>
+    </header>
 
-        <article class="content px-4">
-            @Body
-        </article>
+    <main class="fiori-main-content">
+        @Body
     </main>
 </div>

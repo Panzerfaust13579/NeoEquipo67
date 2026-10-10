@@ -1,11 +1,56 @@
 @VideoGameAPI_HostAddress = http://localhost:5226
 
-GET {{VideoGameAPI_HostAddress}}/todos/
+### 1. Obtener todos los videojuegos
+GET {{VideoGameAPI_HostAddress}}/odata/Videojuegos
 Accept: application/json
 
-###
-
-GET {{VideoGameAPI_HostAddress}}/todos/1
+### 2. Obtener un videojuego por Id
+GET {{VideoGameAPI_HostAddress}}/odata/Videojuegos(1)
 Accept: application/json
 
-###
+### 3. Obtener videojuegos con sus reseñas ($expand)
+GET {{VideoGameAPI_HostAddress}}/odata/Videojuegos?$expand=Resenas
+Accept: application/json
+
+### 4. Filtrar videojuegos por precio ($filter)
+GET {{VideoGameAPI_HostAddress}}/odata/Videojuegos?$filter=Precio gt 20
+Accept: application/json
+
+### 5. Filtrar videojuegos por categoría ($filter)
+GET {{VideoGameAPI_HostAddress}}/odata/Videojuegos?$filter=Categoria eq 'RPG'
+Accept: application/json
+
+### 6. Ordenar videojuegos por precio descendente ($orderby)
+GET {{VideoGameAPI_HostAddress}}/odata/Videojuegos?$orderby=Precio desc
+Accept: application/json
+
+### 7. Consultar con conteo total ($count)
+GET {{VideoGameAPI_HostAddress}}/odata/Videojuegos?$count=true
+Accept: application/json
+
+### 8. Crear un nuevo videojuego (POST)
+POST {{VideoGameAPI_HostAddress}}/odata/Videojuegos
+Content-Type: application/json
+
+{
+  "Nombre": "Metroid Prime Remastered",
+  "Descripcion": "Una aventura de exploración y acción en primera persona en el planeta Tallon IV.",
+  "Precio": 39.99,
+  "Categoria": "Aventura",
+  "ImagenUrl": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80"
+}
+
+### 9. Crear una reseña para un videojuego (POST)
+POST {{VideoGameAPI_HostAddress}}/odata/Resenas
+Content-Type: application/json
+
+{
+  "VideojuegoId": 1,
+  "Calificacion": 5,
+  "Comentario": "Impresionante diseño de niveles y banda sonora.",
+  "Autor": "Ignacio R."
+}
+
+### 10. Obtener todas las reseñas
+GET {{VideoGameAPI_HostAddress}}/odata/Resenas
+Accept: application/json
