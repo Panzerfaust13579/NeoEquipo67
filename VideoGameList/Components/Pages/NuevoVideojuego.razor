@@ -63,6 +63,28 @@
             </div>
 
             <div class="fiori-form-group">
+                <label class="fiori-form-label">Desarrollador *</label>
+                @if (cargandoDesarrolladores)
+                {
+                    <div style="display: flex; align-items: center; gap: 8px; color: var(--sapNeutralColor);">
+                        <div class="fiori-loading-spinner" style="width: 18px; height: 18px;"></div>
+                        <span>Cargando desarrolladores...</span>
+                    </div>
+                }
+                else
+                {
+                    <InputSelect class="fiori-form-control" @bind-Value="modelo.DesarrolladorId">
+                        <option value="0">-- Selecciona un desarrollador --</option>
+                        @foreach (var dev in desarrolladores)
+                        {
+                            <option value="@dev.Id">@dev.Nombre (@dev.Pais)</option>
+                        }
+                    </InputSelect>
+                }
+                <ValidationMessage For="@(() => modelo.DesarrolladorId)" class="fiori-validation-message" />
+            </div>
+
+            <div class="fiori-form-group">
                 <label class="fiori-form-label">URL de la Portada / Imagen</label>
                 <InputText class="fiori-form-control" @bind-Value="modelo.ImagenUrl" placeholder="https://ejemplo.com/portada.jpg" />
                 <ValidationMessage For="@(() => modelo.ImagenUrl)" class="fiori-validation-message" />
@@ -75,7 +97,7 @@
             </div>
 
             <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; border-top: 1px solid var(--sapCardBorderColor); padding-top: 16px;">
-                <button type="button" class="btn-negative" @onclick="Cancelar" disabled="@guardando">
+                <button type="button" class="btn-transparent" @onclick="Cancelar" disabled="@guardando">
                     Cancelar
                 </button>
                 <button type="submit" class="btn-emphasized" disabled="@guardando">
@@ -99,6 +121,25 @@
     private bool guardando = false;
     private string? mensajeConfirmacion;
     private string? mensajeError;
+
+    private List<DesarrolladorDto> desarrolladores = new();
+    private bool cargandoDesarrolladores = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            desarrolladores = await VideojuegoService.GetDesarrolladoresAsync();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"No se pudieron cargar los desarrolladores: {ex.Message}";
+        }
+        finally
+        {
+            cargandoDesarrolladores = false;
+        }
+    }
 
     private async Task Guardar()
     {

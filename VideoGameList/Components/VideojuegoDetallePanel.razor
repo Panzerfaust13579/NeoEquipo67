@@ -20,6 +20,7 @@
 
         <div class="master-item-meta" style="margin-bottom: 12px;">
             <span class="chip-neutral">@Videojuego.Categoria</span>
+            <span class="chip-neutral">🏢 @Videojuego.NombreDesarrollador</span>
 
             @if (Videojuego.TotalResenas > 0)
             {
@@ -38,6 +39,14 @@
         </div>
 
         <p class="detail-desc">@Videojuego.Descripcion</p>
+
+        @if (Videojuego.Desarrollador != null)
+        {
+            <p style="margin: 0 0 14px 0; color: var(--sapNeutralColor); font-size: 13px;">
+                Desarrollado por <strong style="color: var(--sapTextColor);">@Videojuego.Desarrollador.Nombre</strong>
+                · @Videojuego.Desarrollador.Pais · fundado en @Videojuego.Desarrollador.AnioFundacion
+            </p>
+        }
 
         <div style="margin-bottom: 18px;">
             <button class="btn-emphasized" @onclick="VerDetalleCompleto">

@@ -40,7 +40,7 @@
         <div class="fiori-card fiori-empty-state">
             <h3>Videojuego no encontrado</h3>
             <p>No se encontró ningún videojuego con el ID @Id.</p>
-            <button class="btn-emphasized" @onclick="Volver">
+            <button class="btn-transparent" @onclick="Volver">
                 Volver al catálogo
             </button>
         </div>
@@ -57,6 +57,7 @@
                 <div>
                     <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
                         <span class="chip-neutral">@videojuego.Categoria</span>
+                        <span class="chip-neutral">🏢 @videojuego.NombreDesarrollador</span>
                         <span class="chip-neutral">ID: @videojuego.Id</span>
                         @if (videojuego.TotalResenas > 0)
                         {
@@ -77,6 +78,41 @@
                     </p>
                 </div>
             </div>
+        </div>
+
+        <!-- Datos del Desarrollador (entidad relacionada) -->
+        <div class="fiori-card">
+            <h3 style="margin-top: 0; margin-bottom: 12px; border-bottom: 1px solid var(--sapCardBorderColor); padding-bottom: 10px;">
+                Desarrollador
+            </h3>
+            @if (videojuego.Desarrollador == null)
+            {
+                <p style="color: var(--sapNeutralColor); font-style: italic;">Sin información del desarrollador.</p>
+            }
+            else
+            {
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                    <div>
+                        <div class="fiori-form-label">Nombre</div>
+                        <div>@videojuego.Desarrollador.Nombre</div>
+                    </div>
+                    <div>
+                        <div class="fiori-form-label">País</div>
+                        <div>@videojuego.Desarrollador.Pais</div>
+                    </div>
+                    <div>
+                        <div class="fiori-form-label">Año de fundación</div>
+                        <div>@videojuego.Desarrollador.AnioFundacion</div>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(videojuego.Desarrollador.SitioWeb))
+                    {
+                        <div>
+                            <div class="fiori-form-label">Sitio web</div>
+                            <a href="@videojuego.Desarrollador.SitioWeb" target="_blank" style="color: var(--sapBrandColor);">@videojuego.Desarrollador.SitioWeb</a>
+                        </div>
+                    }
+                </div>
+            }
         </div>
 
         <!-- Sección de Reseñas y Formulario para agregar una reseña -->

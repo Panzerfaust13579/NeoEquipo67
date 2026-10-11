@@ -49,7 +49,17 @@ public class VideojuegoService : IVideojuegoService
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("Videojuegos", nuevoVideojuego);
+            // OData solo acepta las propiedades escalares de la entidad (PascalCase, sin calculadas ni navegaciones)
+            var payload = new
+            {
+                nuevoVideojuego.Nombre,
+                nuevoVideojuego.Descripcion,
+                nuevoVideojuego.Precio,
+                nuevoVideojuego.Categoria,
+                nuevoVideojuego.ImagenUrl,
+                nuevoVideojuego.DesarrolladorId
+            };
+            var response = await _httpClient.PostAsJsonAsync("Videojuegos", payload, JsonOptions);
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<VideojuegoDto>(JsonOptions);
@@ -87,7 +97,14 @@ public class VideojuegoService : IVideojuegoService
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("Resenas", nuevaResena);
+            var payload = new
+            {
+                nuevaResena.VideojuegoId,
+                nuevaResena.Calificacion,
+                nuevaResena.Comentario,
+                nuevaResena.Autor
+            };
+            var response = await _httpClient.PostAsJsonAsync("Resenas", payload, JsonOptions);
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<ResenaDto>(JsonOptions);
