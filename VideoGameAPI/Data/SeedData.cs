@@ -6,10 +6,79 @@ public static class SeedData
 {
     public static void Initialize(AppDbContext context)
     {
-        if (context.Videojuegos.Any())
+        if (context.Desarrolladores.Any() || context.Videojuegos.Any())
         {
             return;
         }
+
+        var devNintendo = new Desarrollador
+        {
+            Nombre = "Nintendo EPD",
+            Pais = "Japón",
+            AnioFundacion = 1983,
+            SitioWeb = "https://www.nintendo.com"
+        };
+
+        var devFromSoftware = new Desarrollador
+        {
+            Nombre = "FromSoftware",
+            Pais = "Japón",
+            AnioFundacion = 1986,
+            SitioWeb = "https://www.fromsoftware.jp"
+        };
+
+        var devTeamCherry = new Desarrollador
+        {
+            Nombre = "Team Cherry",
+            Pais = "Australia",
+            AnioFundacion = 2014,
+            SitioWeb = "https://www.teamcherry.com.au"
+        };
+
+        var devCdProjekt = new Desarrollador
+        {
+            Nombre = "CD Projekt Red",
+            Pais = "Polonia",
+            AnioFundacion = 2002,
+            SitioWeb = "https://www.cdprojektred.com"
+        };
+
+        var devPlayground = new Desarrollador
+        {
+            Nombre = "Playground Games",
+            Pais = "Reino Unido",
+            AnioFundacion = 2009,
+            SitioWeb = "https://www.playground-games.com"
+        };
+
+        var devSupergiant = new Desarrollador
+        {
+            Nombre = "Supergiant Games",
+            Pais = "Estados Unidos",
+            AnioFundacion = 2009,
+            SitioWeb = "https://www.supergiantgames.com"
+        };
+
+        var devLarian = new Desarrollador
+        {
+            Nombre = "Larian Studios",
+            Pais = "Bélgica",
+            AnioFundacion = 1996,
+            SitioWeb = "https://larian.com"
+        };
+
+        var desarrolladores = new List<Desarrollador>
+        {
+            devNintendo,
+            devFromSoftware,
+            devTeamCherry,
+            devCdProjekt,
+            devPlayground,
+            devSupergiant,
+            devLarian
+        };
+
+        context.Desarrolladores.AddRange(desarrolladores);
 
         var juegos = new List<Videojuego>
         {
@@ -20,6 +89,7 @@ public static class SeedData
                 Precio = 69.99m,
                 Categoria = "Aventura",
                 ImagenUrl = "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+                Desarrollador = devNintendo,
                 Resenas = new List<Resena>
                 {
                     new() { Calificacion = 5, Comentario = "Una obra maestra de la exploración y la física interactiva.", Autor = "Carlos Gómez" },
@@ -34,6 +104,7 @@ public static class SeedData
                 Precio = 59.99m,
                 Categoria = "RPG",
                 ImagenUrl = "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=600&auto=format&fit=crop&q=80",
+                Desarrollador = devFromSoftware,
                 Resenas = new List<Resena>
                 {
                     new() { Calificacion = 5, Comentario = "El mejor diseño de mundo abierto en un Souls-like hasta la fecha.", Autor = "Diego Ramírez" },
@@ -49,6 +120,7 @@ public static class SeedData
                 Precio = 14.99m,
                 Categoria = "Metroidvania",
                 ImagenUrl = "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80",
+                Desarrollador = devTeamCherry,
                 Resenas = new List<Resena>
                 {
                     new() { Calificacion = 5, Comentario = "Banda sonora y dirección artística insuperables por este precio.", Autor = "Sofía Herrera" },
@@ -62,6 +134,7 @@ public static class SeedData
                 Precio = 49.99m,
                 Categoria = "RPG",
                 ImagenUrl = "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
+                Desarrollador = devCdProjekt,
                 Resenas = new List<Resena>
                 {
                     new() { Calificacion = 4, Comentario = "Tras las últimas actualizaciones se convirtió en una joya imperdible.", Autor = "Javier Ortiz" },
@@ -76,6 +149,7 @@ public static class SeedData
                 Precio = 49.99m,
                 Categoria = "Plataformas",
                 ImagenUrl = "https://images.unsplash.com/photo-1580234811497-9df7fd2f357e?w=600&auto=format&fit=crop&q=80",
+                Desarrollador = devNintendo,
                 Resenas = new List<Resena>
                 {
                     new() { Calificacion = 5, Comentario = "Pura diversión e inventiva en cada reino que visitas.", Autor = "Mariana Ríos" },
@@ -90,6 +164,7 @@ public static class SeedData
                 Precio = 59.99m,
                 Categoria = "Carreras",
                 ImagenUrl = "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80",
+                Desarrollador = devPlayground,
                 Resenas = new List<Resena>
                 {
                     new() { Calificacion = 5, Comentario = "Gráficos fotorrealistas y la conducción más divertida del género.", Autor = "Andrés Molina" },
@@ -104,6 +179,7 @@ public static class SeedData
                 Precio = 24.99m,
                 Categoria = "Roguelike",
                 ImagenUrl = "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=600&auto=format&fit=crop&q=80",
+                Desarrollador = devSupergiant,
                 Resenas = new List<Resena>
                 {
                     new() { Calificacion = 5, Comentario = "Narrativa brillante y jugabilidad adictiva; cada intento es único.", Autor = "Paula Méndez" },
@@ -117,12 +193,27 @@ public static class SeedData
                 Precio = 59.99m,
                 Categoria = "RPG",
                 ImagenUrl = "https://images.unsplash.com/photo-1552824796-7c08974a638a?w=600&auto=format&fit=crop&q=80",
+                Desarrollador = devLarian,
                 Resenas = new List<Resena>
                 {
                     new() { Calificacion = 5, Comentario = "Libertad de rol inigualable. Cada decisión realmente importa.", Autor = "Rodrigo Pardo" },
                     new() { Calificacion = 5, Comentario = "Uno de los mejores juegos de rol de la historia de los videojuegos.", Autor = "Claudia Santoro" },
                     new() { Calificacion = 4, Comentario = "El acto final tiene un ritmo algo apresurado, pero sigue siendo un 10.", Autor = "Felipe Bravo" },
                     new() { Calificacion = 5, Comentario = "Personajes inolvidables con arcos narrativos profundos.", Autor = "Daniela Solís" }
+                }
+            },
+            new()
+            {
+                Nombre = "The Witcher 3: Wild Hunt",
+                Descripcion = "Conviértete en un cazador de monstruos a sueldo y emprende un viaje épico para encontrar a la niña de la profecía.",
+                Precio = 39.99m,
+                Categoria = "RPG",
+                ImagenUrl = "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
+                Desarrollador = devCdProjekt,
+                Resenas = new List<Resena>
+                {
+                    new() { Calificacion = 5, Comentario = "Una de las mejores narrativas y misiones secundarias jamás escritas.", Autor = "Gabriel Soto" },
+                    new() { Calificacion = 5, Comentario = "Geralt de Rivia en su máxima expresión. Mundo vivo y fascinante.", Autor = "Camila Rojas" }
                 }
             }
         };

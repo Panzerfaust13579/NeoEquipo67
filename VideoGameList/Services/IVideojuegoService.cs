@@ -9,4 +9,7 @@ public interface IVideojuegoService
     Task<VideojuegoDto?> CrearVideojuegoAsync(VideojuegoDto nuevoVideojuego);
     Task<List<VideojuegoDto>> BuscarPorCategoriaAsync(string categoria);
     Task<ResenaDto?> CrearResenaAsync(ResenaDto nuevaResena);
+
+    Task<List<DesarrolladorDto>> GetDesarrolladoresAsync();
+    Task<DesarrolladorDto?> GetDesarrolladorAsync(int id);
 }

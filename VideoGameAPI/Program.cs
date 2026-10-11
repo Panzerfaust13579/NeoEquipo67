@@ -32,6 +32,7 @@ builder.Services.AddCors(options =>
 
 // Modelo EDM para OData
 var modelBuilder = new ODataConventionModelBuilder();
+modelBuilder.EntitySet<Desarrollador>("Desarrolladores");
 modelBuilder.EntitySet<Videojuego>("Videojuegos");
 modelBuilder.EntitySet<Resena>("Resenas");
 var edmModel = modelBuilder.GetEdmModel();

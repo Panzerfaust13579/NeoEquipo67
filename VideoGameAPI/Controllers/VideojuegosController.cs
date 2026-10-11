@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.EntityFrameworkCore;
 using VideoGameAPI.Data;
 using VideoGameAPI.Models;
 
@@ -41,6 +42,12 @@ public class VideojuegosController : ODataController
             return BadRequest(ModelState);
         }
 
+        var desarrolladorExiste = await _context.Desarrolladores.AnyAsync(d => d.Id == videojuego.DesarrolladorId);
+        if (!desarrolladorExiste)
+        {
+            return BadRequest($"El desarrollador con ID {videojuego.DesarrolladorId} no existe.");
+        }
+
         _context.Videojuegos.Add(videojuego);
         await _context.SaveChangesAsync();
 
@@ -65,11 +72,18 @@ public class VideojuegosController : ODataController
             return NotFound();
         }
 
+        var desarrolladorExiste = await _context.Desarrolladores.AnyAsync(d => d.Id == update.DesarrolladorId);
+        if (!desarrolladorExiste)
+        {
+            return BadRequest($"El desarrollador con ID {update.DesarrolladorId} no existe.");
+        }
+
         existing.Nombre = update.Nombre;
         existing.Descripcion = update.Descripcion;
         existing.Precio = update.Precio;
         existing.Categoria = update.Categoria;
         existing.ImagenUrl = update.ImagenUrl;
+        existing.DesarrolladorId = update.DesarrolladorId;
 
         await _context.SaveChangesAsync();
         return Updated(existing);
@@ -89,6 +103,13 @@ public class VideojuegosController : ODataController
         }
 
         delta.Patch(existing);
+
+        var desarrolladorExiste = await _context.Desarrolladores.AnyAsync(d => d.Id == existing.DesarrolladorId);
+        if (!desarrolladorExiste)
+        {
+            return BadRequest($"El desarrollador con ID {existing.DesarrolladorId} no existe.");
+        }
+
         await _context.SaveChangesAsync();
 
         return Updated(existing);

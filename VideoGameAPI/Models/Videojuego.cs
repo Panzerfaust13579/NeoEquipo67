@@ -9,5 +9,8 @@ public class Videojuego
     public string Categoria { get; set; } = string.Empty;
     public string ImagenUrl { get; set; } = string.Empty;
 
+    public int DesarrolladorId { get; set; }
+    public Desarrollador? Desarrollador { get; set; }
+
     public ICollection<Resena> Resenas { get; set; } = new List<Resena>();
 }

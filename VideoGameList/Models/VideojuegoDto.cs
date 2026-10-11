@@ -22,9 +22,17 @@ public class VideojuegoDto
     [Url(ErrorMessage = "Debe ser una URL válida")]
     public string ImagenUrl { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "Selecciona un desarrollador")]
+    [Range(1, int.MaxValue, ErrorMessage = "Selecciona un desarrollador")]
+    public int DesarrolladorId { get; set; }
+
+    public DesarrolladorDto? Desarrollador { get; set; }
+
     public List<ResenaDto> Resenas { get; set; } = new();
 
     // Propiedades calculadas (null-safe)
+    public string NombreDesarrollador => Desarrollador?.Nombre ?? "Sin desarrollador";
+
     public double CalificacionPromedio =>
         Resenas != null && Resenas.Count > 0
             ? Math.Round(Resenas.Average(r => r.Calificacion), 1)

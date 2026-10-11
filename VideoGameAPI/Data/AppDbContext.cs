@@ -9,12 +9,25 @@ public class AppDbContext : DbContext
     {
     }
 
+    public DbSet<Desarrollador> Desarrolladores => Set<Desarrollador>();
     public DbSet<Videojuego> Videojuegos => Set<Videojuego>();
     public DbSet<Resena> Resenas => Set<Resena>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Desarrollador>(entity =>
+        {
+            entity.HasKey(d => d.Id);
+            entity.Property(d => d.Nombre).IsRequired().HasMaxLength(150);
+            entity.Property(d => d.Pais).IsRequired().HasMaxLength(100);
+            entity.Property(d => d.SitioWeb).HasMaxLength(250);
+            entity.HasMany(d => d.Videojuegos)
+                  .WithOne(v => v.Desarrollador)
+                  .HasForeignKey(v => v.DesarrolladorId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
 
         modelBuilder.Entity<Videojuego>(entity =>
         {

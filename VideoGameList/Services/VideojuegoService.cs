@@ -21,7 +21,7 @@ public class VideojuegoService : IVideojuegoService
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<ODataResponse<VideojuegoDto>>("Videojuegos?$expand=Resenas", JsonOptions);
+            var response = await _httpClient.GetFromJsonAsync<ODataResponse<VideojuegoDto>>("Videojuegos?$expand=Desarrollador,Resenas", JsonOptions);
             return response?.Value ?? new List<VideojuegoDto>();
         }
         catch (Exception ex)
@@ -35,7 +35,7 @@ public class VideojuegoService : IVideojuegoService
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<VideojuegoDto>($"Videojuegos({id})?$expand=Resenas", JsonOptions);
+            var response = await _httpClient.GetFromJsonAsync<VideojuegoDto>($"Videojuegos({id})?$expand=Desarrollador,Resenas", JsonOptions);
             return response;
         }
         catch (Exception ex)
@@ -70,8 +70,8 @@ public class VideojuegoService : IVideojuegoService
         try
         {
             string url = string.IsNullOrWhiteSpace(categoria)
-                ? "Videojuegos?$expand=Resenas"
-                : $"Videojuegos?$filter=Categoria eq '{Uri.EscapeDataString(categoria)}'&$expand=Resenas";
+                ? "Videojuegos?$expand=Desarrollador,Resenas"
+                : $"Videojuegos?$filter=Categoria eq '{Uri.EscapeDataString(categoria)}'&$expand=Desarrollador,Resenas";
 
             var response = await _httpClient.GetFromJsonAsync<ODataResponse<VideojuegoDto>>(url, JsonOptions);
             return response?.Value ?? new List<VideojuegoDto>();
@@ -99,6 +99,34 @@ public class VideojuegoService : IVideojuegoService
         catch (Exception ex)
         {
             Console.WriteLine($"Error al crear reseña: {ex.Message}");
+            throw;
+        }
+    }
+
+    public async Task<List<DesarrolladorDto>> GetDesarrolladoresAsync()
+    {
+        try
+        {
+            var response = await _httpClient.GetFromJsonAsync<ODataResponse<DesarrolladorDto>>("Desarrolladores?$expand=Videojuegos", JsonOptions);
+            return response?.Value ?? new List<DesarrolladorDto>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al obtener desarrolladores: {ex.Message}");
+            throw;
+        }
+    }
+
+    public async Task<DesarrolladorDto?> GetDesarrolladorAsync(int id)
+    {
+        try
+        {
+            var response = await _httpClient.GetFromJsonAsync<DesarrolladorDto>($"Desarrolladores({id})?$expand=Videojuegos", JsonOptions);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al obtener desarrollador {id}: {ex.Message}");
             throw;
         }
     }
