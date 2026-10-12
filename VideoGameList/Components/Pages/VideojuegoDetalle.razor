@@ -13,13 +13,13 @@
     <!-- SAP Header Bar Component -->
     <div class="fiori-header-bar">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <button class="sap-btn sap-btn--tertiary" @onclick="Volver">
-                ← Volver al catálogo
+            <button class="btn-transparent" @onclick="Volver">
+                <span class="sap-icon sap-icon--nav-back" aria-hidden="true"></span> Volver al catálogo
             </button>
             <h1 class="fiori-header-title">Detalle del videojuego</h1>
         </div>
         <div>
-            <button class="sap-btn sap-btn--secondary" @onclick="CargarDetalle">
+            <button class="btn-default" @onclick="CargarDetalle">
                 Actualizar
             </button>
         </div>
@@ -29,9 +29,9 @@
     @if (!string.IsNullOrEmpty(mensajeError))
     {
         <div class="sap-message-strip sap-message-strip--negative">
-            <span>⚠</span>
+            <span class="sap-icon sap-icon--message-warning" aria-hidden="true"></span>
             <span>@mensajeError</span>
-            <button class="sap-btn sap-btn--tertiary sap-btn--sm" style="margin-left: auto;" @onclick="Volver">
+            <button class="btn-transparent btn-sm" style="margin-left: auto;" @onclick="Volver">
                 Volver al catálogo
             </button>
         </div>
@@ -48,10 +48,10 @@
     else if (videojuego == null)
     {
         <div class="sap-card sap-empty-state">
-            <div class="sap-empty-state-icon">🎮</div>
+            <div class="sap-empty-state-icon"><span class="sap-icon sap-icon--product" aria-hidden="true"></span></div>
             <h3 class="sap-empty-state-title">Videojuego no encontrado</h3>
             <p class="sap-empty-state-desc">No se encontró ningún videojuego con el identificador @Id.</p>
-            <button class="sap-btn sap-btn--primary" @onclick="Volver">
+            <button class="btn-transparent" @onclick="Volver">
                 Volver al catálogo
             </button>
         </div>
@@ -69,14 +69,15 @@
                 <div>
                     <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
                         <span class="sap-badge sap-badge--neutral">@videojuego.Categoria</span>
-                        <span class="sap-badge sap-badge--neutral">🏢 @videojuego.NombreDesarrollador</span>
+                        <span class="sap-badge sap-badge--neutral"><span class="sap-icon sap-icon--building" aria-hidden="true"></span> @videojuego.NombreDesarrollador</span>
                         <span class="sap-badge sap-badge--neutral">ID: @videojuego.Id</span>
                         @if (videojuego.TotalResenas > 0)
                         {
                             var cal = videojuego.CalificacionPromedio;
                             <div class="sap-rating-indicator">
-                                <span class="sap-rating-stars">★</span>
-                                <span class="sap-rating-score">@cal.ToString("0.0")</span>
+                                <span class="sap-badge @VideojuegoDto.ObtenerClaseCalificacion(cal)">
+                                    <span class="sap-icon sap-icon--favorite" aria-hidden="true"></span> @cal.ToString("0.0")
+                                </span>
                                 <span class="sap-rating-count">(@videojuego.TotalResenas reseñas)</span>
                             </div>
                         }
@@ -145,14 +146,13 @@
                     @foreach (var resena in videojuego.Resenas)
                     {
                         var initial = string.IsNullOrWhiteSpace(resena.Autor) ? "U" : resena.Autor.Substring(0, 1).ToUpperInvariant();
-                        var resenaBadge = resena.Calificacion >= 4 ? "sap-badge--positive" : resena.Calificacion == 3 ? "sap-badge--critical" : "sap-badge--negative";
                         <div class="review-card">
                             <div class="review-header">
                                 <div class="review-user-info">
                                     <span class="sap-avatar">@initial</span>
                                     <span class="review-author">@resena.Autor</span>
                                 </div>
-                                <span class="sap-badge @resenaBadge">★ @resena.Calificacion / 5</span>
+                                <span class="sap-badge @VideojuegoDto.ObtenerClaseCalificacion(resena.Calificacion)"><span class="sap-icon sap-icon--favorite" aria-hidden="true"></span> @resena.Calificacion / 5</span>
                             </div>
                             <p class="review-comment">@resena.Comentario</p>
                         </div>
@@ -174,7 +174,7 @@
                 @if (!string.IsNullOrEmpty(mensajeResenaExito))
                 {
                     <div class="sap-message-strip sap-message-strip--positive">
-                        <span>✔</span>
+                        <span class="sap-icon sap-icon--message-success" aria-hidden="true"></span>
                         <span>@mensajeResenaExito</span>
                     </div>
                 }
@@ -205,7 +205,7 @@
                     </label>
                     <textarea class="sap-textarea" rows="3" @bind="nuevaResenaComentario" placeholder="Escribe tu opinión sobre el videojuego..."></textarea>
                 </div>
-                <button class="sap-btn sap-btn--positive" @onclick="GuardarResena" disabled="@guardandoResena">
+                <button class="btn-positive" @onclick="GuardarResena" disabled="@guardandoResena">
                     @(guardandoResena ? "Guardando reseña..." : "Publicar reseña")
                 </button>
             </div>

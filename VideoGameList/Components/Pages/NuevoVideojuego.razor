@@ -13,8 +13,8 @@
     <!-- SAP Header Bar Component -->
     <div class="fiori-header-bar">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <button class="sap-btn sap-btn--tertiary" @onclick="Cancelar">
-                ← Volver al catálogo
+            <button class="btn-transparent" @onclick="Cancelar">
+                <span class="sap-icon sap-icon--nav-back" aria-hidden="true"></span> Volver al catálogo
             </button>
             <h1 class="fiori-header-title">Crear nuevo videojuego</h1>
         </div>
@@ -24,7 +24,7 @@
     @if (!string.IsNullOrEmpty(mensajeConfirmacion))
     {
         <div class="sap-message-strip sap-message-strip--positive">
-            <span>✔</span>
+            <span class="sap-icon sap-icon--message-success" aria-hidden="true"></span>
             <span>@mensajeConfirmacion</span>
         </div>
     }
@@ -32,7 +32,7 @@
     @if (!string.IsNullOrEmpty(mensajeError))
     {
         <div class="sap-message-strip sap-message-strip--negative">
-            <span>⚠</span>
+            <span class="sap-icon sap-icon--message-warning" aria-hidden="true"></span>
             <span>@mensajeError</span>
         </div>
     }
@@ -126,10 +126,10 @@
             <!-- Action Buttons Footer -->
             <hr class="sap-divider" />
             <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center;">
-                <button type="button" class="sap-btn sap-btn--secondary" @onclick="Cancelar" disabled="@guardando">
+                <button type="button" class="btn-transparent" @onclick="Cancelar" disabled="@guardando">
                     Cancelar
                 </button>
-                <button type="submit" class="sap-btn sap-btn--primary" disabled="@guardando">
+                <button type="submit" class="btn-emphasized" disabled="@guardando">
                     @(guardando ? "Guardando..." : "Guardar videojuego")
                 </button>
             </div>

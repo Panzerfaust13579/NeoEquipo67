@@ -12,8 +12,8 @@
             </p>
         </div>
         <div style="display: flex; gap: 10px;">
-            <button class="sap-btn sap-btn--primary" @onclick="@(() => Navigation.NavigateTo("/videojuego/nuevo"))">
-                + Nuevo videojuego
+            <button class="btn-emphasized" @onclick="@(() => Navigation.NavigateTo("/videojuego/nuevo"))">
+                <span class="sap-icon sap-icon--add" aria-hidden="true"></span> Nuevo videojuego
             </button>
         </div>
     </div>
@@ -30,7 +30,7 @@
             <option value="Carreras">Carreras</option>
             <option value="Roguelike">Roguelike</option>
         </select>
-        <button class="sap-btn sap-btn--secondary" @onclick="CargarVideojuegos">
+        <button class="btn-default" @onclick="CargarVideojuegos">
             Actualizar lista
         </button>
     </div>
@@ -39,9 +39,9 @@
     @if (!string.IsNullOrEmpty(mensajeError))
     {
         <div class="sap-message-strip sap-message-strip--negative">
-            <span>⚠</span>
+            <span class="sap-icon sap-icon--message-warning" aria-hidden="true"></span>
             <span>@mensajeError</span>
-            <button class="sap-btn sap-btn--tertiary sap-btn--sm" style="margin-left: auto;" @onclick="CargarVideojuegos">
+            <button class="btn-transparent btn-sm" style="margin-left: auto;" @onclick="CargarVideojuegos">
                 Reintentar
             </button>
         </div>
@@ -59,10 +59,10 @@
     {
         <!-- Empty State Component -->
         <div class="sap-card sap-empty-state">
-            <div class="sap-empty-state-icon">🎮</div>
+            <div class="sap-empty-state-icon"><span class="sap-icon sap-icon--product" aria-hidden="true"></span></div>
             <h3 class="sap-empty-state-title">No se encontraron videojuegos</h3>
             <p class="sap-empty-state-desc">No hay videojuegos registrados o que coincidan con el filtro actual.</p>
-            <button class="sap-btn sap-btn--primary" @onclick="@(() => Navigation.NavigateTo("/videojuego/nuevo"))">
+            <button class="btn-emphasized" @onclick="@(() => Navigation.NavigateTo("/videojuego/nuevo"))">
                 Registrar el primer videojuego
             </button>
         </div>
@@ -86,14 +86,15 @@
                                 <div class="master-item-price">$@juego.Precio.ToString("0.00")</div>
                                 <div class="master-item-meta">
                                     <span class="sap-badge sap-badge--neutral">@juego.Categoria</span>
-                                    <span class="sap-badge sap-badge--neutral">🏢 @juego.NombreDesarrollador</span>
+                                    <span class="sap-badge sap-badge--neutral"><span class="sap-icon sap-icon--building" aria-hidden="true"></span> @juego.NombreDesarrollador</span>
 
                                     @if (juego.TotalResenas > 0)
                                     {
                                         var cal = juego.CalificacionPromedio;
                                         <div class="sap-rating-indicator">
-                                            <span class="sap-rating-stars">★</span>
-                                            <span class="sap-rating-score">@cal.ToString("0.0")</span>
+                                            <span class="sap-badge @VideojuegoDto.ObtenerClaseCalificacion(cal)">
+                                                <span class="sap-icon sap-icon--favorite" aria-hidden="true"></span> @cal.ToString("0.0")
+                                            </span>
                                             <span class="sap-rating-count">(@juego.TotalResenas)</span>
                                         </div>
                                     }

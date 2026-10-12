@@ -39,4 +39,11 @@ public class VideojuegoDto
             : 0;
 
     public int TotalResenas => Resenas?.Count ?? 0;
+
+    public static string ObtenerClaseCalificacion(double calificacion)
+    {
+        if (calificacion >= 4.0) return "chip-positive sap-badge--positive";
+        if (calificacion >= 3.0) return "chip-critical sap-badge--critical";
+        return "chip-negative sap-badge--negative";
+    }
 }

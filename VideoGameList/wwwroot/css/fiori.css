@@ -80,6 +80,25 @@
     /* Divider Token */
     --sapDividerColor: #E5E6E8;
     --sapDividerHeight: 1px;
+
+    /* Additional Color and Shadow Tokens */
+    --sapShellShadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+    --sapShellLinkColor: rgba(255, 255, 255, 0.85);
+    --sapShellHoverBg: rgba(255, 255, 255, 0.12);
+    --sapShellActiveBg: rgba(255, 255, 255, 0.22);
+    --sapTertiaryHoverBg: rgba(10, 110, 209, 0.08);
+    --sapTertiaryActiveBg: rgba(10, 110, 209, 0.15);
+    --sapAvatarBgColor: #E5F0FA;
+    --sapInputFocusShadow: 0 0 0 2px rgba(10, 110, 209, 0.25);
+    --sapInputErrorShadow: 0 0 0 2px rgba(187, 0, 0, 0.15);
+    --sapRatingStarColor: #E76500;
+    --sapErrorUiBackground: #FFFFE0;
+    --sapErrorUiShadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    --sapNavbarBorderColor: rgba(255, 255, 255, 0.1);
+    --sapNavbarTogglerCheckedBg: rgba(255, 255, 255, 0.5);
+    --sapNavbarTopRowBg: rgba(0, 0, 0, 0.4);
+    --sapNavbarActiveBg: rgba(255, 255, 255, 0.37);
+    --sapNavbarHoverBg: rgba(255, 255, 255, 0.1);
 }
 
 * {
@@ -111,7 +130,7 @@ body, html {
     align-items: center;
     justify-content: space-between;
     padding: 0 24px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--sapShellShadow);
 }
 
 .fiori-shellbar-left {
@@ -138,7 +157,7 @@ body, html {
 }
 
 .fiori-shellbar-link {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--sapShellLinkColor);
     text-decoration: none;
     font-size: 13.5px;
     font-weight: 500;
@@ -149,12 +168,12 @@ body, html {
 
 .fiori-shellbar-link:hover {
     color: var(--sapWhite);
-    background-color: rgba(255, 255, 255, 0.12);
+    background-color: var(--sapShellHoverBg);
 }
 
 .fiori-shellbar-link.active {
     color: var(--sapWhite);
-    background-color: rgba(255, 255, 255, 0.22);
+    background-color: var(--sapShellActiveBg);
     font-weight: 600;
 }
 
@@ -291,7 +310,8 @@ body, html {
     font-size: 15px;
 }
 
-.sap-btn--sm {
+.sap-btn--sm,
+.btn-sm {
     height: var(--sapButtonHeightS); /* 25px */
     padding: 0 10px;
     font-size: 12px;
@@ -346,12 +366,12 @@ body, html {
 
 .sap-btn--tertiary:hover,
 .btn-transparent:hover {
-    background-color: rgba(10, 110, 209, 0.08);
+    background-color: var(--sapTertiaryHoverBg);
 }
 
 .sap-btn--tertiary:active,
 .btn-transparent:active {
-    background-color: rgba(10, 110, 209, 0.15);
+    background-color: var(--sapTertiaryActiveBg);
 }
 
 /* Semantic Intent: Positive (Commit / Create / Save) */
@@ -513,7 +533,7 @@ body, html {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background-color: #E5F0FA;
+    background-color: var(--sapAvatarBgColor);
     color: var(--sapBrandColor);
     display: inline-flex;
     align-items: center;
@@ -600,7 +620,7 @@ body, html {
 .fiori-form-control:focus {
     outline: none;
     border-color: var(--sapBrandColor);
-    box-shadow: 0 0 0 2px rgba(10, 110, 209, 0.25);
+    box-shadow: var(--sapInputFocusShadow);
 }
 
 .sap-textarea,
@@ -614,7 +634,7 @@ textarea.fiori-form-control {
 .fiori-form-control.is-invalid,
 .sap-input--error {
     border-color: var(--sapNegativeColor);
-    box-shadow: 0 0 0 2px rgba(187, 0, 0, 0.15);
+    box-shadow: var(--sapInputErrorShadow);
 }
 
 .fiori-validation-message,
@@ -654,7 +674,7 @@ textarea.fiori-form-control {
 }
 
 .sap-rating-stars {
-    color: #E76500;
+    color: var(--sapRatingStarColor);
     font-size: 15px;
     line-height: 1;
 }
@@ -914,4 +934,62 @@ textarea.fiori-form-control {
     color: var(--sapTextColor);
     margin: 0;
     line-height: 1.5;
+}
+
+/* ==========================================================================
+   SAP Iconography (SAP-icons font)
+   ========================================================================== */
+@font-face {
+    font-family: "SAP-icons";
+    src: url("../fonts/SAP-icons.woff2") format("woff2"),
+         url("../fonts/SAP-icons.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+.sap-icon {
+    font-family: "SAP-icons";
+    font-style: normal;
+    font-weight: normal;
+    speak: never;
+    display: inline-block;
+    line-height: 1;
+    vertical-align: middle;
+    color: currentColor;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.sap-icon--media-play::before      { content: "\e14b"; }
+.sap-icon--product::before         { content: "\e011"; }
+.sap-icon--building::before        { content: "\e199"; }
+.sap-icon--favorite::before        { content: "\e065"; }
+.sap-icon--message-warning::before { content: "\e201"; }
+.sap-icon--message-success::before { content: "\e203"; }
+.sap-icon--nav-back::before        { content: "\e1eb"; }
+.sap-icon--add::before             { content: "\e058"; }
+.sap-icon--refresh::before         { content: "\e010"; }
+.sap-icon--filter::before          { content: "\e076"; }
+.sap-icon--decline::before         { content: "\e013"; }
+.sap-icon--sys-cancel::before      { content: "\e03e"; }
+
+.btn-emphasized .sap-icon,
+.btn-default .sap-icon,
+.btn-transparent .sap-icon,
+.btn-positive .sap-icon,
+.btn-negative .sap-icon,
+.sap-btn .sap-icon,
+.sap-badge .sap-icon {
+    margin-right: 6px;
+    font-size: 0.95em;
+}
+
+.fiori-shellbar-logo .sap-icon {
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+.sap-empty-state-icon .sap-icon {
+    font-size: 42px;
 }
