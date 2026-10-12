@@ -1,0 +1,26 @@
+@inherits LayoutComponentBase
+
+<div class="fiori-app">
+    <!-- SAP ShellBar Component -->
+    <header class="fiori-shellbar">
+        <div class="fiori-shellbar-left">
+            <a class="fiori-shellbar-logo" href="">
+                <span><span class="sap-icon sap-icon--media-play" aria-hidden="true"></span>VideoGame Catalog</span>
+            </a>
+            <nav class="fiori-shellbar-nav">
+                <NavLink class="fiori-shellbar-link" href="" Match="NavLinkMatch.All">
+                    Inicio
+                </NavLink>
+            </nav>
+        </div>
+        <div class="fiori-shellbar-actions">
+            <span class="sap-badge sap-badge--neutral">
+                SAP Digital Design
+            </span>
+        </div>
+    </header>
+
+    <main class="fiori-main-content">
+        @Body
+    </main>
+</div>

@@ -1,0 +1,185 @@
+@page "/"
+@inject VideojuegoService VideojuegoService
+@inject NavigationManager Navigation
+
+<div class="fiori-page">
+    <!-- Header Bar Component -->
+    <div class="fiori-header-bar">
+        <div>
+            <h1 class="fiori-header-title">Catálogo de videojuegos</h1>
+            <p class="fiori-header-subtitle">
+                Gestión y consulta con servicio OData y SAP Digital Design System
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="sap-btn sap-btn--primary" @onclick="@(() => Navigation.NavigateTo("/videojuego/nuevo"))">
+                <span class="sap-icon sap-icon--add" aria-hidden="true"></span> Nuevo videojuego
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter Bar Component -->
+    <div class="fiori-search-bar">
+        <label class="sap-form-label" style="margin: 0;">Filtrar por categoría:</label>
+        <select class="fiori-filter-select" @onchange="OnCategoriaChanged">
+            <option value="">Todas las categorías</option>
+            <option value="RPG">RPG</option>
+            <option value="Aventura">Aventura</option>
+            <option value="Metroidvania">Metroidvania</option>
+            <option value="Plataformas">Plataformas</option>
+            <option value="Carreras">Carreras</option>
+            <option value="Roguelike">Roguelike</option>
+        </select>
+        <button class="sap-btn sap-btn--secondary" @onclick="CargarVideojuegos">
+            <span class="sap-icon sap-icon--refresh" aria-hidden="true"></span> Actualizar lista
+        </button>
+    </div>
+
+    <!-- Message Strip Component for Errors -->
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="sap-message-strip sap-message-strip--negative">
+            <span class="sap-icon sap-icon--message-warning" aria-hidden="true"></span>
+            <span>@mensajeError</span>
+            <button class="sap-btn sap-btn--tertiary sap-btn--sm" style="margin-left: auto;" @onclick="CargarVideojuegos">
+                Reintentar
+            </button>
+        </div>
+    }
+
+    <!-- Loading Indicator Component -->
+    @if (cargando)
+    {
+        <div class="sap-card sap-empty-state">
+            <div class="sap-loading-spinner"></div>
+            <p style="margin-top: 14px;">Cargando catálogo desde el servicio OData...</p>
+        </div>
+    }
+    else if (videojuegos.Count == 0)
+    {
+        <!-- Empty State Component -->
+        <div class="sap-card sap-empty-state">
+            <div class="sap-empty-state-icon"><span class="sap-icon sap-icon--product" aria-hidden="true"></span></div>
+            <h3 class="sap-empty-state-title">No se encontraron videojuegos</h3>
+            <p class="sap-empty-state-desc">No hay videojuegos registrados o que coincidan con el filtro actual.</p>
+            <button class="sap-btn sap-btn--primary" @onclick="@(() => Navigation.NavigateTo("/videojuego/nuevo"))">
+                Registrar el primer videojuego
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="master-detail-container">
+            <!-- Master List: Video Game Cards -->
+            <div class="master-list">
+                @foreach (var juego in videojuegos)
+                {
+                    var isSelected = videojuegoSeleccionado?.Id == juego.Id;
+                    <div class="sap-card fiori-card-interactive @(isSelected ? "selected" : "")"
+                         @onclick="() => SeleccionarVideojuego(juego)">
+                        <div class="master-item">
+                            <img src="@(string.IsNullOrWhiteSpace(juego.ImagenUrl) ? "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600" : juego.ImagenUrl)"
+                                 alt="@juego.Nombre"
+                                 class="master-item-image" />
+                            <div class="master-item-info">
+                                <h3 class="master-item-title">@juego.Nombre</h3>
+                                <div class="master-item-price">$@juego.Precio.ToString("0.00")</div>
+                                <div class="master-item-meta">
+                                    <span class="sap-badge sap-badge--neutral">@juego.Categoria</span>
+                                    <span class="sap-badge sap-badge--neutral"><span class="sap-icon sap-icon--building" aria-hidden="true"></span> @juego.NombreDesarrollador</span>
+
+                                    @if (juego.TotalResenas > 0)
+                                    {
+                                        var cal = juego.CalificacionPromedio;
+                                        <div class="sap-rating-indicator">
+                                            <span class="sap-rating-stars"><span class="sap-icon sap-icon--favorite" aria-hidden="true"></span></span>
+                                            <span class="sap-rating-score">@cal.ToString("0.0")</span>
+                                            <span class="sap-rating-count">(@juego.TotalResenas)</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="sap-badge sap-badge--neutral">Sin reseñas</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Detail Column: Receives data via CascadingParameter -->
+            <div>
+                <CascadingValue Value="videojuegoSeleccionado" Name="VideojuegoSeleccionado">
+                    <VideojuegoDetallePanel />
+                </CascadingValue>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<VideojuegoDto> videojuegos = new();
+    private VideojuegoDto? videojuegoSeleccionado;
+    private bool cargando = true;
+    private string? mensajeError;
+    private string categoriaSeleccionada = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarVideojuegos();
+    }
+
+    private async Task CargarVideojuegos()
+    {
+        cargando = true;
+        mensajeError = null;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(categoriaSeleccionada))
+            {
+                videojuegos = await VideojuegoService.GetVideojuegosAsync(true);
+            }
+            else
+            {
+                videojuegos = await VideojuegoService.BuscarPorCategoriaAsync(categoriaSeleccionada);
+            }
+
+            if (videojuegos.Any())
+            {
+                if (videojuegoSeleccionado == null || !videojuegos.Any(v => v.Id == videojuegoSeleccionado.Id))
+                {
+                    videojuegoSeleccionado = videojuegos.First();
+                }
+                else
+                {
+                    videojuegoSeleccionado = videojuegos.First(v => v.Id == videojuegoSeleccionado.Id);
+                }
+            }
+            else
+            {
+                videojuegoSeleccionado = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al comunicarse con el servicio OData: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private void SeleccionarVideojuego(VideojuegoDto juego)
+    {
+        videojuegoSeleccionado = juego;
+    }
+
+    private async Task OnCategoriaChanged(ChangeEventArgs e)
+    {
+        categoriaSeleccionada = e.Value?.ToString() ?? string.Empty;
+        await CargarVideojuegos();
+    }
+}

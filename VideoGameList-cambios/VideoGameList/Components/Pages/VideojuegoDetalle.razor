@@ -1,0 +1,298 @@
+@page "/videojuego/{Id:int}"
+@inject VideojuegoService VideojuegoService
+@inject NavigationManager Navigation
+
+<div class="fiori-page">
+    <!-- SAP Breadcrumb Component -->
+    <nav class="sap-breadcrumb" aria-label="Breadcrumb">
+        <a href="/" class="sap-breadcrumb-item">Inicio</a>
+        <span class="sap-breadcrumb-separator">/</span>
+        <span class="sap-breadcrumb-current">Detalle del videojuego</span>
+    </nav>
+
+    <!-- SAP Header Bar Component -->
+    <div class="fiori-header-bar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="sap-btn sap-btn--tertiary" @onclick="Volver">
+                <span class="sap-icon sap-icon--nav-back" aria-hidden="true"></span> Volver al catálogo
+            </button>
+            <h1 class="fiori-header-title">Detalle del videojuego</h1>
+        </div>
+        <div>
+            <button class="sap-btn sap-btn--secondary" @onclick="CargarDetalle">
+                Actualizar
+            </button>
+        </div>
+    </div>
+
+    <!-- Message Strip for Error States -->
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="sap-message-strip sap-message-strip--negative">
+            <span class="sap-icon sap-icon--message-warning" aria-hidden="true"></span>
+            <span>@mensajeError</span>
+            <button class="sap-btn sap-btn--tertiary sap-btn--sm" style="margin-left: auto;" @onclick="Volver">
+                Volver al catálogo
+            </button>
+        </div>
+    }
+
+    <!-- Loading Indicator Component -->
+    @if (cargando)
+    {
+        <div class="sap-card sap-empty-state">
+            <div class="sap-loading-spinner"></div>
+            <p style="margin-top: 14px;">Cargando información del videojuego...</p>
+        </div>
+    }
+    else if (videojuego == null)
+    {
+        <div class="sap-card sap-empty-state">
+            <div class="sap-empty-state-icon"><span class="sap-icon sap-icon--product" aria-hidden="true"></span></div>
+            <h3 class="sap-empty-state-title">Videojuego no encontrado</h3>
+            <p class="sap-empty-state-desc">No se encontró ningún videojuego con el identificador @Id.</p>
+            <button class="sap-btn sap-btn--primary" @onclick="Volver">
+                Volver al catálogo
+            </button>
+        </div>
+    }
+    else
+    {
+        <!-- Main Game Card / Tile Component -->
+        <div class="sap-card">
+            <div style="display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: 24px; align-items: start;">
+                <div>
+                    <img src="@(string.IsNullOrWhiteSpace(videojuego.ImagenUrl) ? "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600" : videojuego.ImagenUrl)"
+                         alt="@videojuego.Nombre"
+                         style="width: 100%; border-radius: var(--sapBorderRadius); border: 1px solid var(--sapCardBorderColor); object-fit: cover; max-height: 380px;" />
+                </div>
+                <div>
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
+                        <span class="sap-badge sap-badge--neutral">@videojuego.Categoria</span>
+                        <span class="sap-badge sap-badge--neutral"><span class="sap-icon sap-icon--building" aria-hidden="true"></span> @videojuego.NombreDesarrollador</span>
+                        <span class="sap-badge sap-badge--neutral">ID: @videojuego.Id</span>
+                        @if (videojuego.TotalResenas > 0)
+                        {
+                            var cal = videojuego.CalificacionPromedio;
+                            <div class="sap-rating-indicator">
+                                <span class="sap-rating-stars"><span class="sap-icon sap-icon--favorite" aria-hidden="true"></span></span>
+                                <span class="sap-rating-score">@cal.ToString("0.0")</span>
+                                <span class="sap-rating-count">(@videojuego.TotalResenas reseñas)</span>
+                            </div>
+                        }
+                    </div>
+
+                    <h2 style="font-size: 26px; font-weight: 700; margin: 0 0 10px 0; color: var(--sapTextColor);">@videojuego.Nombre</h2>
+                    <div class="master-item-price" style="font-size: 22px; margin-bottom: 16px;">
+                        $@videojuego.Precio.ToString("0.00")
+                    </div>
+
+                    <h4 style="margin: 16px 0 6px 0; font-size: 15px; color: var(--sapTextColor);">Descripción</h4>
+                    <p style="font-size: 14px; line-height: 1.7; color: var(--sapTextColor); margin: 0;">
+                        @videojuego.Descripcion
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Developer Information Card (Related Entity) -->
+        <div class="sap-card">
+            <div class="sap-card-header">
+                <h3 class="sap-card-title">Datos del desarrollador</h3>
+                <span class="sap-badge sap-badge--information">Entidad relacionada OData</span>
+            </div>
+            @if (videojuego.Desarrollador == null)
+            {
+                <p style="color: var(--sapTextMutedColor); font-style: italic; margin: 0;">Sin información del desarrollador.</p>
+            }
+            else
+            {
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <div>
+                        <div class="sap-form-label" style="color: var(--sapTextMutedColor);">Nombre</div>
+                        <div style="font-weight: 600; color: var(--sapTextColor);">@videojuego.Desarrollador.Nombre</div>
+                    </div>
+                    <div>
+                        <div class="sap-form-label" style="color: var(--sapTextMutedColor);">País</div>
+                        <div style="font-weight: 600; color: var(--sapTextColor);">@videojuego.Desarrollador.Pais</div>
+                    </div>
+                    <div>
+                        <div class="sap-form-label" style="color: var(--sapTextMutedColor);">Año de fundación</div>
+                        <div style="font-weight: 600; color: var(--sapTextColor);">@videojuego.Desarrollador.AnioFundacion</div>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(videojuego.Desarrollador.SitioWeb))
+                    {
+                        <div>
+                            <div class="sap-form-label" style="color: var(--sapTextMutedColor);">Sitio web</div>
+                            <a href="@videojuego.Desarrollador.SitioWeb" target="_blank" rel="noopener noreferrer" style="color: var(--sapLinkColor); font-weight: 600; text-decoration: none;">
+                                @videojuego.Desarrollador.SitioWeb
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- User Reviews Card & Creation Form -->
+        <div class="sap-card">
+            <div class="sap-card-header">
+                <h3 class="sap-card-title">Reseñas de usuarios (@videojuego.TotalResenas)</h3>
+            </div>
+
+            @if (videojuego.Resenas != null && videojuego.Resenas.Any())
+            {
+                <div class="review-list">
+                    @foreach (var resena in videojuego.Resenas)
+                    {
+                        var initial = string.IsNullOrWhiteSpace(resena.Autor) ? "U" : resena.Autor.Substring(0, 1).ToUpperInvariant();
+                        var resenaBadge = resena.Calificacion >= 4 ? "sap-badge--positive" : resena.Calificacion == 3 ? "sap-badge--critical" : "sap-badge--negative";
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-user-info">
+                                    <span class="sap-avatar">@initial</span>
+                                    <span class="review-author">@resena.Autor</span>
+                                </div>
+                                <span class="sap-badge @resenaBadge"><span class="sap-icon sap-icon--favorite" aria-hidden="true"></span> @resena.Calificacion / 5</span>
+                            </div>
+                            <p class="review-comment">@resena.Comentario</p>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p style="color: var(--sapTextMutedColor); font-style: italic; margin: 0 0 16px 0;">
+                    Aún no hay reseñas registradas para este videojuego.
+                </p>
+            }
+
+            <!-- Form: Add Review -->
+            <hr class="sap-divider" />
+            <div>
+                <h4 style="margin: 0 0 14px 0; font-size: 15px; color: var(--sapTextColor);">Agregar una nueva reseña</h4>
+
+                @if (!string.IsNullOrEmpty(mensajeResenaExito))
+                {
+                    <div class="sap-message-strip sap-message-strip--positive">
+                        <span class="sap-icon sap-icon--message-success" aria-hidden="true"></span>
+                        <span>@mensajeResenaExito</span>
+                    </div>
+                }
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
+                    <div class="fiori-form-group" style="margin: 0;">
+                        <label class="sap-form-label">
+                            Tu nombre <span class="sap-form-required">*</span>
+                        </label>
+                        <input class="sap-input" @bind="nuevaResenaAutor" placeholder="Ej. Juan Pérez" />
+                    </div>
+                    <div class="fiori-form-group" style="margin: 0;">
+                        <label class="sap-form-label">
+                            Calificación (1 a 5) <span class="sap-form-required">*</span>
+                        </label>
+                        <select class="sap-select" @bind="nuevaResenaCalificacion">
+                            <option value="5">5 - Excelente</option>
+                            <option value="4">4 - Muy bueno</option>
+                            <option value="3">3 - Regular</option>
+                            <option value="2">2 - Malo</option>
+                            <option value="1">1 - Pésimo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="fiori-form-group">
+                    <label class="sap-form-label">
+                        Comentario <span class="sap-form-required">*</span>
+                    </label>
+                    <textarea class="sap-textarea" rows="3" @bind="nuevaResenaComentario" placeholder="Escribe tu opinión sobre el videojuego..."></textarea>
+                </div>
+                <button class="sap-btn sap-btn--positive" @onclick="GuardarResena" disabled="@guardandoResena">
+                    @(guardandoResena ? "Guardando reseña..." : "Publicar reseña")
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private VideojuegoDto? videojuego;
+    private bool cargando = true;
+    private string? mensajeError;
+
+    private string nuevaResenaAutor = string.Empty;
+    private int nuevaResenaCalificacion = 5;
+    private string nuevaResenaComentario = string.Empty;
+    private bool guardandoResena = false;
+    private string? mensajeResenaExito;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await CargarDetalle();
+    }
+
+    private async Task CargarDetalle()
+    {
+        cargando = true;
+        mensajeError = null;
+
+        try
+        {
+            videojuego = await VideojuegoService.GetVideojuegoAsync(Id);
+            if (videojuego == null)
+            {
+                mensajeError = $"No se encontró el videojuego con ID {Id}.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al consultar el videojuego: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private async Task GuardarResena()
+    {
+        if (string.IsNullOrWhiteSpace(nuevaResenaAutor) || string.IsNullOrWhiteSpace(nuevaResenaComentario))
+        {
+            return;
+        }
+
+        guardandoResena = true;
+        mensajeResenaExito = null;
+
+        try
+        {
+            var resena = new ResenaDto
+            {
+                VideojuegoId = Id,
+                Autor = nuevaResenaAutor,
+                Calificacion = nuevaResenaCalificacion,
+                Comentario = nuevaResenaComentario
+            };
+
+            await VideojuegoService.CrearResenaAsync(resena);
+            nuevaResenaAutor = string.Empty;
+            nuevaResenaComentario = string.Empty;
+            mensajeResenaExito = "¡Reseña registrada con éxito!";
+            await CargarDetalle();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al registrar reseña: {ex.Message}";
+        }
+        finally
+        {
+            guardandoResena = false;
+        }
+    }
+
+    private void Volver()
+    {
+        Navigation.NavigateTo("/");
+    }
+}
