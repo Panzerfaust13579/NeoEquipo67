@@ -1,22 +1,24 @@
 @inherits LayoutComponentBase
 
 <div class="fiori-app">
-    <!-- Shell Bar fijo arriba en el layout principal -->
+    <!-- SAP ShellBar Component -->
     <header class="fiori-shellbar">
         <div class="fiori-shellbar-left">
             <a class="fiori-shellbar-logo" href="">
-                <span>VideoGame API - SAP Fiori</span>
+                <span>🎮 VideoGame Catalog</span>
             </a>
-            <NavLink class="btn-transparent" href="" Match="NavLinkMatch.All" style="color: var(--sapWhite);">
-                Inicio
-            </NavLink>
-            <NavLink class="btn-transparent" href="videojuego/nuevo" style="color: var(--sapWhite);">
-                Nuevo Videojuego
-            </NavLink>
+            <nav class="fiori-shellbar-nav">
+                <NavLink class="fiori-shellbar-link" href="" Match="NavLinkMatch.All">
+                    Inicio
+                </NavLink>
+                <NavLink class="fiori-shellbar-link" href="videojuego/nuevo">
+                    Nuevo videojuego
+                </NavLink>
+            </nav>
         </div>
         <div class="fiori-shellbar-actions">
-            <span class="chip-neutral">
-                Fiori Launchpad
+            <span class="sap-badge sap-badge--neutral">
+                SAP Digital Design
             </span>
         </div>
     </header>

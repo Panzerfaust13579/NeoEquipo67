@@ -1,17 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using VideoGameAPI.Models;
+using System.Collections.Generic;
 
 namespace VideoGameAPI.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext (DbContextOptions<AppDbContext> options) : DbContext (options)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
 
-    public DbSet<Desarrollador> Desarrolladores => Set<Desarrollador>();
-    public DbSet<Videojuego> Videojuegos => Set<Videojuego>();
-    public DbSet<Resena> Resenas => Set<Resena>();
+    public DbSet<Desarrollador> Desarrolladores { get; set; }
+    public DbSet<Videojuego> Videojuegos { get; set; }
+    public DbSet<Resena> Resenas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -8,46 +8,40 @@ using VideoGameAPI.Models;
 
 namespace VideoGameAPI.Controllers;
 
-public class ResenasController : ODataController
+public class ResenasController(AppDbContext context) : ODataController
 {
-    private readonly AppDbContext _context;
-
-    public ResenasController(AppDbContext context)
-    {
-        _context = context;
-    }
 
     [EnableQuery]
-    public IActionResult Get()
+    public ActionResult<IQueryable<Resena>> Get()
     {
-        return Ok(_context.Resenas);
+        return Ok(context.Resenas);
     }
 
-    [EnableQuery]
-    public IActionResult Get([FromRoute] int key)
+    [HttpGet("odata/Reviews({key})")]
+    public ActionResult Get([FromRoute] int key)
     {
-        var resena = _context.Resenas.Where(r => r.Id == key);
-        if (!resena.Any())
+        var resena = context.Resenas.SingleOrDefault(r => r.Id == key);
+        if (resena == null)
         {
             return NotFound();
         }
-        return Ok(SingleResult.Create(resena));
+        return Ok(resena);
     }
 
-    public async Task<IActionResult> Post([FromBody] Resena resena)
+    public ActionResult Post([FromBody] Resena resena)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        _context.Resenas.Add(resena);
-        await _context.SaveChangesAsync();
+        context.Resenas.Add(resena);
+        context.SaveChanges();
 
         return Created(resena);
     }
 
-    public async Task<IActionResult> Put([FromRoute] int key, [FromBody] Resena update)
+    public ActionResult Put([FromRoute] int key, [FromBody] Resena update)
     {
         if (!ModelState.IsValid)
         {
@@ -59,7 +53,7 @@ public class ResenasController : ODataController
             return BadRequest("El id no coincide con la clave proporcionada.");
         }
 
-        var existing = await _context.Resenas.FindAsync(key);
+        var existing = context.Resenas.SingleOrDefault(r => r.Id == key);
         if (existing == null)
         {
             return NotFound();
@@ -70,39 +64,39 @@ public class ResenasController : ODataController
         existing.Autor = update.Autor;
         existing.VideojuegoId = update.VideojuegoId;
 
-        await _context.SaveChangesAsync();
+        context.SaveChanges();
         return Updated(existing);
     }
 
-    public async Task<IActionResult> Patch([FromRoute] int key, [FromBody] Delta<Resena> delta)
+    public ActionResult Patch([FromRoute] int key, [FromBody] Delta<Resena> delta)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        var existing = await _context.Resenas.FindAsync(key);
+        var existing = context.Resenas.SingleOrDefault(r => r.Id == key);
         if (existing == null)
         {
             return NotFound();
         }
 
         delta.Patch(existing);
-        await _context.SaveChangesAsync();
+        context.SaveChanges();
 
         return Updated(existing);
     }
 
-    public async Task<IActionResult> Delete([FromRoute] int key)
+    public ActionResult Delete([FromRoute] int key)
     {
-        var existing = await _context.Resenas.FindAsync(key);
+        var existing = context.Resenas.SingleOrDefault(r => r.Id == key);
         if (existing == null)
         {
             return NotFound();
         }
 
-        _context.Resenas.Remove(existing);
-        await _context.SaveChangesAsync();
+        context.Resenas.Remove(existing);
+        context.SaveChanges();
 
         return NoContent();
     }

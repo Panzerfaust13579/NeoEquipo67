@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace VideoGameAPI.Models;
 
 public class Desarrollador
@@ -7,6 +9,6 @@ public class Desarrollador
     public string Pais { get; set; } = string.Empty;
     public int AnioFundacion { get; set; }
     public string? SitioWeb { get; set; }
-
-    public ICollection<Videojuego> Videojuegos { get; set; } = new List<Videojuego>();
+    public ICollection<Videojuego> Videojuegos { get; set; } = [];
 }
+

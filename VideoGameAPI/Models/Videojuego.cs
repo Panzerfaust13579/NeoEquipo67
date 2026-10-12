@@ -12,5 +12,5 @@ public class Videojuego
     public int DesarrolladorId { get; set; }
     public Desarrollador? Desarrollador { get; set; }
 
-    public ICollection<Resena> Resenas { get; set; } = new List<Resena>();
+    public ICollection<Resena> Resenas { get; set; } = [];
 }

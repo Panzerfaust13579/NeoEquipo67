@@ -9,52 +9,46 @@ using VideoGameAPI.Models;
 
 namespace VideoGameAPI.Controllers;
 
-public class VideojuegosController : ODataController
+public class VideojuegosController(AppDbContext context) : ODataController
 {
-    private readonly AppDbContext _context;
-
-    public VideojuegosController(AppDbContext context)
-    {
-        _context = context;
-    }
 
     [EnableQuery]
-    public IActionResult Get()
+    public ActionResult<IQueryable<Videojuego>> Get()
     {
-        return Ok(_context.Videojuegos);
+        return Ok(context.Videojuegos);
     }
 
-    [EnableQuery]
-    public IActionResult Get([FromRoute] int key)
+    [HttpGet("odata/VideoGames({key})")]
+    public ActionResult<Videojuego> Get([FromRoute] int key)
     {
-        var juego = _context.Videojuegos.Where(v => v.Id == key);
-        if (!juego.Any())
+        var juego = context.Videojuegos.SingleOrDefault(v => v.Id == key);
+        if (juego == null)
         {
             return NotFound();
         }
-        return Ok(SingleResult.Create(juego));
+        return Ok(juego);
     }
 
-    public async Task<IActionResult> Post([FromBody] Videojuego videojuego)
+    public ActionResult Post([FromBody] Videojuego videojuego)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        var desarrolladorExiste = await _context.Desarrolladores.AnyAsync(d => d.Id == videojuego.DesarrolladorId);
-        if (!desarrolladorExiste)
+        var desarrolladorExiste = context.Desarrolladores.SingleOrDefault(d => d.Id == videojuego.DesarrolladorId);
+        if (desarrolladorExiste == null)
         {
             return BadRequest($"El desarrollador con ID {videojuego.DesarrolladorId} no existe.");
         }
 
-        _context.Videojuegos.Add(videojuego);
-        await _context.SaveChangesAsync();
+        context.Videojuegos.Add(videojuego);
+        context.SaveChanges();
 
         return Created(videojuego);
     }
 
-    public async Task<IActionResult> Put([FromRoute] int key, [FromBody] Videojuego update)
+    public ActionResult Put([FromRoute] int key, [FromBody] Videojuego update)
     {
         if (!ModelState.IsValid)
         {
@@ -66,14 +60,14 @@ public class VideojuegosController : ODataController
             return BadRequest("El id no coincide con la clave proporcionada.");
         }
 
-        var existing = await _context.Videojuegos.FindAsync(key);
+        var existing =  context.Videojuegos.SingleOrDefault(v => v.Id == key);
         if (existing == null)
         {
             return NotFound();
         }
 
-        var desarrolladorExiste = await _context.Desarrolladores.AnyAsync(d => d.Id == update.DesarrolladorId);
-        if (!desarrolladorExiste)
+        var desarrolladorExiste = context.Desarrolladores.SingleOrDefault(d => d.Id == update.DesarrolladorId);
+        if (desarrolladorExiste == null)
         {
             return BadRequest($"El desarrollador con ID {update.DesarrolladorId} no existe.");
         }
@@ -85,18 +79,18 @@ public class VideojuegosController : ODataController
         existing.ImagenUrl = update.ImagenUrl;
         existing.DesarrolladorId = update.DesarrolladorId;
 
-        await _context.SaveChangesAsync();
+        context.SaveChanges();
         return Updated(existing);
     }
 
-    public async Task<IActionResult> Patch([FromRoute] int key, [FromBody] Delta<Videojuego> delta)
+    public ActionResult Patch([FromRoute] int key, [FromBody] Delta<Videojuego> delta)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        var existing = await _context.Videojuegos.FindAsync(key);
+        var existing = context.Videojuegos.SingleOrDefault(v => v.Id == key);
         if (existing == null)
         {
             return NotFound();
@@ -104,28 +98,31 @@ public class VideojuegosController : ODataController
 
         delta.Patch(existing);
 
-        var desarrolladorExiste = await _context.Desarrolladores.AnyAsync(d => d.Id == existing.DesarrolladorId);
-        if (!desarrolladorExiste)
+        var desarrolladorExiste = context.Desarrolladores.SingleOrDefault(d => d.Id == existing.DesarrolladorId);
+        if (desarrolladorExiste == null)
         {
             return BadRequest($"El desarrollador con ID {existing.DesarrolladorId} no existe.");
         }
 
-        await _context.SaveChangesAsync();
+        context.SaveChanges();
 
         return Updated(existing);
     }
 
-    public async Task<IActionResult> Delete([FromRoute] int key)
+    public ActionResult Delete([FromRoute] int key)
     {
-        var existing = await _context.Videojuegos.FindAsync(key);
+        var existing = context.Videojuegos.SingleOrDefault(v => v.Id == key);
         if (existing == null)
         {
             return NotFound();
         }
 
-        _context.Videojuegos.Remove(existing);
-        await _context.SaveChangesAsync();
+        context.Videojuegos.Remove(existing);
+        context.SaveChanges();
 
         return NoContent();
     }
-}
+
+}   
+
+  

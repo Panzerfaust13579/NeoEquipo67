@@ -15,17 +15,15 @@ namespace VideoGameList
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
-            builder.Services.AddMauiBlazorWebView();
-
-            // Configuración de URL base dinámica según la plataforma
-            string baseUrl = DeviceInfo.Platform == DevicePlatform.Android
-                ? "http://10.0.2.2:5226/odata/"
-                : "http://localhost:5226/odata/";
-
-            builder.Services.AddHttpClient<IVideojuegoService, VideojuegoService>(client =>
+            builder.Services.AddHttpClient<VideojuegoService>(client =>
             {
-                client.BaseAddress = new Uri(baseUrl);
+                client.BaseAddress = new Uri("http://localhost:5226/odata/");
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
+
+            
+
+            builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

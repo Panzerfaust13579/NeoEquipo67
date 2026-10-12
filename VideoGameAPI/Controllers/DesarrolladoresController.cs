@@ -8,46 +8,40 @@ using VideoGameAPI.Models;
 
 namespace VideoGameAPI.Controllers;
 
-public class DesarrolladoresController : ODataController
+public class DesarrolladoresController(AppDbContext context) : ODataController
 {
-    private readonly AppDbContext _context;
-
-    public DesarrolladoresController(AppDbContext context)
-    {
-        _context = context;
-    }
 
     [EnableQuery]
-    public IActionResult Get()
+    public ActionResult<IQueryable<Desarrollador>> Get()
     {
-        return Ok(_context.Desarrolladores);
+        return Ok(context.Desarrolladores);
     }
 
-    [EnableQuery]
-    public IActionResult Get([FromRoute] int key)
+    [HttpGet("odata/Developers({key})")]
+    public ActionResult Get([FromRoute] int key)
     {
-        var desarrollador = _context.Desarrolladores.Where(d => d.Id == key);
-        if (!desarrollador.Any())
+        var desarrollador = context.Desarrolladores.SingleOrDefault(d => d.Id == key);
+        if (desarrollador == null)
         {
             return NotFound();
         }
-        return Ok(SingleResult.Create(desarrollador));
+        return Ok(desarrollador);
     }
 
-    public async Task<IActionResult> Post([FromBody] Desarrollador desarrollador)
+    public ActionResult Post([FromBody] Desarrollador desarrollador)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        _context.Desarrolladores.Add(desarrollador);
-        await _context.SaveChangesAsync();
+        context.Desarrolladores.Add(desarrollador);
+        context.SaveChanges();
 
         return Created(desarrollador);
     }
 
-    public async Task<IActionResult> Put([FromRoute] int key, [FromBody] Desarrollador update)
+    public ActionResult Put([FromRoute] int key, [FromBody] Desarrollador update)
     {
         if (!ModelState.IsValid)
         {
@@ -59,7 +53,7 @@ public class DesarrolladoresController : ODataController
             return BadRequest("El id no coincide con la clave proporcionada.");
         }
 
-        var existing = await _context.Desarrolladores.FindAsync(key);
+        var existing = context.Desarrolladores.FirstOrDefault(d => d.Id == key);
         if (existing == null)
         {
             return NotFound();
@@ -70,7 +64,7 @@ public class DesarrolladoresController : ODataController
         existing.AnioFundacion = update.AnioFundacion;
         existing.SitioWeb = update.SitioWeb;
 
-        await _context.SaveChangesAsync();
+        context.SaveChanges();
         return Updated(existing);
     }
 
@@ -81,28 +75,28 @@ public class DesarrolladoresController : ODataController
             return BadRequest(ModelState);
         }
 
-        var existing = await _context.Desarrolladores.FindAsync(key);
+        var existing = context.Desarrolladores.FirstOrDefault(d => d.Id == key);
         if (existing == null)
         {
             return NotFound();
         }
 
         delta.Patch(existing);
-        await _context.SaveChangesAsync();
+        context.SaveChanges();
 
         return Updated(existing);
     }
 
-    public async Task<IActionResult> Delete([FromRoute] int key)
+    public ActionResult Delete([FromRoute] int key)
     {
-        var existing = await _context.Desarrolladores.FindAsync(key);
+        var existing = context.Desarrolladores.FirstOrDefault(d => d.Id == key);
         if (existing == null)
         {
             return NotFound();
         }
 
-        _context.Desarrolladores.Remove(existing);
-        await _context.SaveChangesAsync();
+        context.Desarrolladores.Remove(existing);
+        context.SaveChanges();
 
         return NoContent();
     }

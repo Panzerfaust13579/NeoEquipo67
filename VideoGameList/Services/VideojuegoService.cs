@@ -4,24 +4,14 @@ using VideoGameList.Models;
 
 namespace VideoGameList.Services;
 
-public class VideojuegoService : IVideojuegoService
+public class VideojuegoService(HttpClient httpClient)
 {
-    private readonly HttpClient _httpClient;
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
-
-    public VideojuegoService(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
-
-    public async Task<List<VideojuegoDto>> GetVideojuegosAsync()
+    public async Task<List<VideojuegoDto>> GetVideojuegosAsync(bool includeDetails)
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<ODataResponse<VideojuegoDto>>("Videojuegos?$expand=Desarrollador,Resenas", JsonOptions);
+            var url = includeDetails ? "Videojuegos?$expand=Desarrollador,Resenas" : "Videojuegos"; 
+            var response = await httpClient.GetFromJsonAsync<ODataResponse<VideojuegoDto>>(url);
             return response?.Value ?? new List<VideojuegoDto>();
         }
         catch (Exception ex)
@@ -35,8 +25,14 @@ public class VideojuegoService : IVideojuegoService
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<VideojuegoDto>($"Videojuegos({id})?$expand=Desarrollador,Resenas", JsonOptions);
-            return response;
+            var response = await httpClient.GetFromJsonAsync<ODataResponse<VideojuegoDto>>($"Videojuegos?$filter=Id eq {id}&$expand=Desarrollador,Resenas");
+            var juego = response?.Value?.FirstOrDefault();
+            if (juego != null)
+            {
+                return juego;
+            }
+
+            return await httpClient.GetFromJsonAsync<VideojuegoDto>($"Videojuegos({id})?$expand=Desarrollador,Resenas");
         }
         catch (Exception ex)
         {
@@ -49,7 +45,6 @@ public class VideojuegoService : IVideojuegoService
     {
         try
         {
-            // OData solo acepta las propiedades escalares de la entidad (PascalCase, sin calculadas ni navegaciones)
             var payload = new
             {
                 nuevoVideojuego.Nombre,
@@ -59,10 +54,10 @@ public class VideojuegoService : IVideojuegoService
                 nuevoVideojuego.ImagenUrl,
                 nuevoVideojuego.DesarrolladorId
             };
-            var response = await _httpClient.PostAsJsonAsync("Videojuegos", payload, JsonOptions);
+            var response = await httpClient.PostAsJsonAsync("Videojuegos", payload);
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<VideojuegoDto>(JsonOptions);
+                return await response.Content.ReadFromJsonAsync<VideojuegoDto>();
             }
 
             var errorBody = await response.Content.ReadAsStringAsync();
@@ -83,7 +78,7 @@ public class VideojuegoService : IVideojuegoService
                 ? "Videojuegos?$expand=Desarrollador,Resenas"
                 : $"Videojuegos?$filter=Categoria eq '{Uri.EscapeDataString(categoria)}'&$expand=Desarrollador,Resenas";
 
-            var response = await _httpClient.GetFromJsonAsync<ODataResponse<VideojuegoDto>>(url, JsonOptions);
+            var response = await httpClient.GetFromJsonAsync<ODataResponse<VideojuegoDto>>(url);
             return response?.Value ?? new List<VideojuegoDto>();
         }
         catch (Exception ex)
@@ -104,10 +99,10 @@ public class VideojuegoService : IVideojuegoService
                 nuevaResena.Comentario,
                 nuevaResena.Autor
             };
-            var response = await _httpClient.PostAsJsonAsync("Resenas", payload, JsonOptions);
+            var response = await httpClient.PostAsJsonAsync("Resenas", payload);
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<ResenaDto>(JsonOptions);
+                return await response.Content.ReadFromJsonAsync<ResenaDto>();
             }
 
             var errorBody = await response.Content.ReadAsStringAsync();
@@ -124,7 +119,7 @@ public class VideojuegoService : IVideojuegoService
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<ODataResponse<DesarrolladorDto>>("Desarrolladores?$expand=Videojuegos", JsonOptions);
+            var response = await httpClient.GetFromJsonAsync<ODataResponse<DesarrolladorDto>>("Desarrolladores?$expand=Videojuegos");
             return response?.Value ?? new List<DesarrolladorDto>();
         }
         catch (Exception ex)
@@ -138,8 +133,15 @@ public class VideojuegoService : IVideojuegoService
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<DesarrolladorDto>($"Desarrolladores({id})?$expand=Videojuegos", JsonOptions);
-            return response;
+            var response = await httpClient.GetFromJsonAsync<ODataResponse<DesarrolladorDto>>($"Desarrolladores?$filter=Id eq {id}&$expand=Videojuegos");
+            var desarrollador = response?.Value?.FirstOrDefault();
+            if (desarrollador != null)
+            {
+                return desarrollador;
+            }
+
+            var url = $"Desarrolladores({id})?$expand=Videojuegos";
+            return await httpClient.GetFromJsonAsync<DesarrolladorDto>(url);
         }
         catch (Exception ex)
         {

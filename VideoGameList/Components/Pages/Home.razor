@@ -1,25 +1,26 @@
 @page "/"
-@inject IVideojuegoService VideojuegoService
+@inject VideojuegoService VideojuegoService
 @inject NavigationManager Navigation
 
 <div class="fiori-page">
+    <!-- Header Bar Component -->
     <div class="fiori-header-bar">
         <div>
-            <h1 class="fiori-header-title">Catálogo de Videojuegos</h1>
-            <p style="margin: 4px 0 0 0; color: var(--sapNeutralColor);">
-                Gestión y consulta con servicio OData y diseño SAP Fiori
+            <h1 class="fiori-header-title">Catálogo de videojuegos</h1>
+            <p class="fiori-header-subtitle">
+                Gestión y consulta con servicio OData y SAP Digital Design System
             </p>
         </div>
         <div style="display: flex; gap: 10px;">
-            <button class="btn-emphasized" @onclick="@(() => Navigation.NavigateTo("/videojuego/nuevo"))">
-                + Nuevo Videojuego
+            <button class="sap-btn sap-btn--primary" @onclick="@(() => Navigation.NavigateTo("/videojuego/nuevo"))">
+                + Nuevo videojuego
             </button>
         </div>
     </div>
 
-    <!-- Barra de Filtros Fiori -->
-    <div class="fiori-card fiori-search-bar">
-        <label style="font-weight: 600; color: var(--sapTextColor);">Filtrar por Categoría:</label>
+    <!-- Filter Bar Component -->
+    <div class="fiori-search-bar">
+        <label class="sap-form-label" style="margin: 0;">Filtrar por categoría:</label>
         <select class="fiori-filter-select" @onchange="OnCategoriaChanged">
             <option value="">Todas las categorías</option>
             <option value="RPG">RPG</option>
@@ -29,49 +30,52 @@
             <option value="Carreras">Carreras</option>
             <option value="Roguelike">Roguelike</option>
         </select>
-        <button class="btn-default" @onclick="CargarVideojuegos">
-            Actualizar Lista
+        <button class="sap-btn sap-btn--secondary" @onclick="CargarVideojuegos">
+            Actualizar lista
         </button>
     </div>
 
+    <!-- Message Strip Component for Errors -->
     @if (!string.IsNullOrEmpty(mensajeError))
     {
-        <div class="fiori-message-strip negative">
+        <div class="sap-message-strip sap-message-strip--negative">
             <span>⚠</span>
             <span>@mensajeError</span>
-            <button class="btn-transparent" style="margin-left: auto;" @onclick="CargarVideojuegos">
+            <button class="sap-btn sap-btn--tertiary sap-btn--sm" style="margin-left: auto;" @onclick="CargarVideojuegos">
                 Reintentar
             </button>
         </div>
     }
 
+    <!-- Loading Indicator Component -->
     @if (cargando)
     {
-        <div class="fiori-card fiori-empty-state">
-            <div class="fiori-loading-spinner"></div>
+        <div class="sap-card sap-empty-state">
+            <div class="sap-loading-spinner"></div>
             <p style="margin-top: 14px;">Cargando catálogo desde el servicio OData...</p>
         </div>
     }
     else if (videojuegos.Count == 0)
     {
-        <div class="fiori-card fiori-empty-state">
-            <div style="font-size: 32px; margin-bottom: 8px;">🎮</div>
-            <h3>No se encontraron videojuegos</h3>
-            <p>No hay videojuegos registrados o que coincidan con el filtro actual.</p>
-            <button class="btn-emphasized" @onclick="@(() => Navigation.NavigateTo("/videojuego/nuevo"))">
-                Registrar el primero
+        <!-- Empty State Component -->
+        <div class="sap-card sap-empty-state">
+            <div class="sap-empty-state-icon">🎮</div>
+            <h3 class="sap-empty-state-title">No se encontraron videojuegos</h3>
+            <p class="sap-empty-state-desc">No hay videojuegos registrados o que coincidan con el filtro actual.</p>
+            <button class="sap-btn sap-btn--primary" @onclick="@(() => Navigation.NavigateTo("/videojuego/nuevo"))">
+                Registrar el primer videojuego
             </button>
         </div>
     }
     else
     {
         <div class="master-detail-container">
-            <!-- Columna Master: Lista de Videojuegos -->
+            <!-- Master List: Video Game Cards -->
             <div class="master-list">
                 @foreach (var juego in videojuegos)
                 {
                     var isSelected = videojuegoSeleccionado?.Id == juego.Id;
-                    <div class="fiori-card fiori-card-interactive @(isSelected ? "selected" : "")"
+                    <div class="sap-card fiori-card-interactive @(isSelected ? "selected" : "")"
                          @onclick="() => SeleccionarVideojuego(juego)">
                         <div class="master-item">
                             <img src="@(string.IsNullOrWhiteSpace(juego.ImagenUrl) ? "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600" : juego.ImagenUrl)"
@@ -81,18 +85,21 @@
                                 <h3 class="master-item-title">@juego.Nombre</h3>
                                 <div class="master-item-price">$@juego.Precio.ToString("0.00")</div>
                                 <div class="master-item-meta">
-                                    <span class="chip-neutral">@juego.Categoria</span>
-                                    <span class="chip-neutral">🏢 @juego.NombreDesarrollador</span>
+                                    <span class="sap-badge sap-badge--neutral">@juego.Categoria</span>
+                                    <span class="sap-badge sap-badge--neutral">🏢 @juego.NombreDesarrollador</span>
 
                                     @if (juego.TotalResenas > 0)
                                     {
                                         var cal = juego.CalificacionPromedio;
-                                        var chipClass = cal >= 4.0 ? "chip-positive" : cal >= 3.0 ? "chip-critical" : "chip-negative";
-                                        <span class="@chipClass">★ @cal.ToString("0.0") (@juego.TotalResenas)</span>
+                                        <div class="sap-rating-indicator">
+                                            <span class="sap-rating-stars">★</span>
+                                            <span class="sap-rating-score">@cal.ToString("0.0")</span>
+                                            <span class="sap-rating-count">(@juego.TotalResenas)</span>
+                                        </div>
                                     }
                                     else
                                     {
-                                        <span class="chip-neutral">Sin reseñas</span>
+                                        <span class="sap-badge sap-badge--neutral">Sin reseñas</span>
                                     }
                                 </div>
                             </div>
@@ -101,7 +108,7 @@
                 }
             </div>
 
-            <!-- Columna Detail: Recibe datos exclusivamente por CascadingParameter -->
+            <!-- Detail Column: Receives data via CascadingParameter -->
             <div>
                 <CascadingValue Value="videojuegoSeleccionado" Name="VideojuegoSeleccionado">
                     <VideojuegoDetallePanel />
@@ -132,7 +139,7 @@
         {
             if (string.IsNullOrWhiteSpace(categoriaSeleccionada))
             {
-                videojuegos = await VideojuegoService.GetVideojuegosAsync();
+                videojuegos = await VideojuegoService.GetVideojuegosAsync(true);
             }
             else
             {

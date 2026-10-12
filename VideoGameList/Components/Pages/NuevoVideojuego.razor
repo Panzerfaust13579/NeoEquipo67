@@ -1,20 +1,29 @@
 @page "/videojuego/nuevo"
-@inject IVideojuegoService VideojuegoService
+@inject VideojuegoService VideojuegoService
 @inject NavigationManager Navigation
 
-<div class="fiori-page" style="max-width: 800px;">
+<div class="fiori-page" style="max-width: 860px;">
+    <!-- SAP Breadcrumb Component -->
+    <nav class="sap-breadcrumb" aria-label="Breadcrumb">
+        <a href="/" class="sap-breadcrumb-item">Inicio</a>
+        <span class="sap-breadcrumb-separator">/</span>
+        <span class="sap-breadcrumb-current">Nuevo videojuego</span>
+    </nav>
+
+    <!-- SAP Header Bar Component -->
     <div class="fiori-header-bar">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <button class="btn-transparent" @onclick="Cancelar">
-                ← Volver
+            <button class="sap-btn sap-btn--tertiary" @onclick="Cancelar">
+                ← Volver al catálogo
             </button>
-            <h1 class="fiori-header-title">Crear Nuevo Videojuego</h1>
+            <h1 class="fiori-header-title">Crear nuevo videojuego</h1>
         </div>
     </div>
 
+    <!-- Message Strip Component (Feedback States) -->
     @if (!string.IsNullOrEmpty(mensajeConfirmacion))
     {
-        <div class="fiori-message-strip positive">
+        <div class="sap-message-strip sap-message-strip--positive">
             <span>✔</span>
             <span>@mensajeConfirmacion</span>
         </div>
@@ -22,32 +31,44 @@
 
     @if (!string.IsNullOrEmpty(mensajeError))
     {
-        <div class="fiori-message-strip negative">
+        <div class="sap-message-strip sap-message-strip--negative">
             <span>⚠</span>
             <span>@mensajeError</span>
         </div>
     }
 
-    <div class="fiori-card">
+    <!-- SAP Card / Form Component -->
+    <div class="sap-card">
+        <div class="sap-card-header">
+            <h3 class="sap-card-title">Información del videojuego</h3>
+            <span class="sap-badge sap-badge--information">Formulario OData</span>
+        </div>
+
         <EditForm Model="modelo" OnValidSubmit="Guardar">
             <DataAnnotationsValidator />
 
             <div class="fiori-form-group">
-                <label class="fiori-form-label">Nombre del Videojuego *</label>
-                <InputText class="fiori-form-control" @bind-Value="modelo.Nombre" placeholder="Ej. Metroid Dread" />
-                <ValidationMessage For="@(() => modelo.Nombre)" class="fiori-validation-message" />
+                <label class="sap-form-label">
+                    Nombre del videojuego <span class="sap-form-required">*</span>
+                </label>
+                <InputText class="sap-input" @bind-Value="modelo.Nombre" placeholder="Ej. Metroid Dread" />
+                <ValidationMessage For="@(() => modelo.Nombre)" class="sap-form-error" />
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                 <div class="fiori-form-group">
-                    <label class="fiori-form-label">Precio ($ USD) *</label>
-                    <InputNumber class="fiori-form-control" @bind-Value="modelo.Precio" step="0.01" />
-                    <ValidationMessage For="@(() => modelo.Precio)" class="fiori-validation-message" />
+                    <label class="sap-form-label">
+                        Precio ($ USD) <span class="sap-form-required">*</span>
+                    </label>
+                    <InputNumber class="sap-input" @bind-Value="modelo.Precio" step="0.01" />
+                    <ValidationMessage For="@(() => modelo.Precio)" class="sap-form-error" />
                 </div>
 
                 <div class="fiori-form-group">
-                    <label class="fiori-form-label">Categoría *</label>
-                    <InputSelect class="fiori-form-control" @bind-Value="modelo.Categoria">
+                    <label class="sap-form-label">
+                        Categoría <span class="sap-form-required">*</span>
+                    </label>
+                    <InputSelect class="sap-select" @bind-Value="modelo.Categoria">
                         <option value="">-- Selecciona una categoría --</option>
                         <option value="RPG">RPG</option>
                         <option value="Aventura">Aventura</option>
@@ -58,22 +79,24 @@
                         <option value="Estrategia">Estrategia</option>
                         <option value="Acción">Acción</option>
                     </InputSelect>
-                    <ValidationMessage For="@(() => modelo.Categoria)" class="fiori-validation-message" />
+                    <ValidationMessage For="@(() => modelo.Categoria)" class="sap-form-error" />
                 </div>
             </div>
 
             <div class="fiori-form-group">
-                <label class="fiori-form-label">Desarrollador *</label>
+                <label class="sap-form-label">
+                    Desarrollador <span class="sap-form-required">*</span>
+                </label>
                 @if (cargandoDesarrolladores)
                 {
-                    <div style="display: flex; align-items: center; gap: 8px; color: var(--sapNeutralColor);">
-                        <div class="fiori-loading-spinner" style="width: 18px; height: 18px;"></div>
+                    <div style="display: flex; align-items: center; gap: 8px; color: var(--sapTextMutedColor);">
+                        <div class="sap-loading-spinner" style="width: 18px; height: 18px; border-width: 2px;"></div>
                         <span>Cargando desarrolladores...</span>
                     </div>
                 }
                 else
                 {
-                    <InputSelect class="fiori-form-control" @bind-Value="modelo.DesarrolladorId">
+                    <InputSelect class="sap-select" @bind-Value="modelo.DesarrolladorId">
                         <option value="0">-- Selecciona un desarrollador --</option>
                         @foreach (var dev in desarrolladores)
                         {
@@ -81,27 +104,33 @@
                         }
                     </InputSelect>
                 }
-                <ValidationMessage For="@(() => modelo.DesarrolladorId)" class="fiori-validation-message" />
+                <ValidationMessage For="@(() => modelo.DesarrolladorId)" class="sap-form-error" />
             </div>
 
             <div class="fiori-form-group">
-                <label class="fiori-form-label">URL de la Portada / Imagen</label>
-                <InputText class="fiori-form-control" @bind-Value="modelo.ImagenUrl" placeholder="https://ejemplo.com/portada.jpg" />
-                <ValidationMessage For="@(() => modelo.ImagenUrl)" class="fiori-validation-message" />
+                <label class="sap-form-label">
+                    URL de la portada / imagen
+                </label>
+                <InputText class="sap-input" @bind-Value="modelo.ImagenUrl" placeholder="https://ejemplo.com/portada.jpg" />
+                <ValidationMessage For="@(() => modelo.ImagenUrl)" class="sap-form-error" />
             </div>
 
             <div class="fiori-form-group">
-                <label class="fiori-form-label">Descripción</label>
-                <InputTextArea class="fiori-form-control" rows="4" @bind-Value="modelo.Descripcion" placeholder="Describe brevemente la trama, jugabilidad y características del videojuego..." />
-                <ValidationMessage For="@(() => modelo.Descripcion)" class="fiori-validation-message" />
+                <label class="sap-form-label">
+                    Descripción
+                </label>
+                <InputTextArea class="sap-textarea" rows="4" @bind-Value="modelo.Descripcion" placeholder="Describe brevemente la trama, jugabilidad y características del videojuego..." />
+                <ValidationMessage For="@(() => modelo.Descripcion)" class="sap-form-error" />
             </div>
 
-            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; border-top: 1px solid var(--sapCardBorderColor); padding-top: 16px;">
-                <button type="button" class="btn-transparent" @onclick="Cancelar" disabled="@guardando">
+            <!-- Action Buttons Footer -->
+            <hr class="sap-divider" />
+            <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center;">
+                <button type="button" class="sap-btn sap-btn--secondary" @onclick="Cancelar" disabled="@guardando">
                     Cancelar
                 </button>
-                <button type="submit" class="btn-emphasized" disabled="@guardando">
-                    @(guardando ? "Guardando en OData..." : "Guardar Videojuego")
+                <button type="submit" class="sap-btn sap-btn--primary" disabled="@guardando">
+                    @(guardando ? "Guardando..." : "Guardar videojuego")
                 </button>
             </div>
         </EditForm>

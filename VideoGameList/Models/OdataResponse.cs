@@ -11,5 +11,5 @@ public class ODataResponse<T>
     public long? Count { get; set; }
 
     [JsonPropertyName("value")]
-    public List<T> Value { get; set; } = new();
+    public List<T> Value { get; set; } = [];
 }
