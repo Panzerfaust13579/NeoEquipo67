@@ -179,35 +179,46 @@
                     </div>
                 }
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
-                    <div class="fiori-form-group" style="margin: 0;">
-                        <label class="sap-form-label">
-                            Tu nombre <span class="sap-form-required">*</span>
-                        </label>
-                        <input class="sap-input" @bind="nuevaResenaAutor" placeholder="Ej. Juan Pérez" />
+                <EditForm Model="nuevaResena" OnValidSubmit="GuardarResena">
+                    <DataAnnotationsValidator />
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
+                        <div class="fiori-form-group" style="margin: 0;">
+                            <label class="sap-form-label">
+                                Tu nombre <span class="sap-form-required">*</span>
+                            </label>
+                            <InputText class="sap-input" @bind-Value="nuevaResena.Autor" placeholder="Ej. Juan Pérez" />
+                            <ValidationMessage For="@(() => nuevaResena.Autor)" />
+                        </div>
+                        <div class="fiori-form-group" style="margin: 0;">
+                            <label class="sap-form-label">
+                                Calificación (1 a 5) <span class="sap-form-required">*</span>
+                            </label>
+                            <InputSelect class="sap-select" @bind-Value="nuevaResena.Calificacion">
+                                <option value="5">5 - Excelente</option>
+                                <option value="4">4 - Muy bueno</option>
+                                <option value="3">3 - Regular</option>
+                                <option value="2">2 - Malo</option>
+                                <option value="1">1 - Pésimo</option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => nuevaResena.Calificacion)" />
+                        </div>
                     </div>
-                    <div class="fiori-form-group" style="margin: 0;">
+
+                    <div class="fiori-form-group">
                         <label class="sap-form-label">
-                            Calificación (1 a 5) <span class="sap-form-required">*</span>
+                            Comentario <span class="sap-form-required">*</span>
                         </label>
-                        <select class="sap-select" @bind="nuevaResenaCalificacion">
-                            <option value="5">5 - Excelente</option>
-                            <option value="4">4 - Muy bueno</option>
-                            <option value="3">3 - Regular</option>
-                            <option value="2">2 - Malo</option>
-                            <option value="1">1 - Pésimo</option>
-                        </select>
+                        <InputTextArea class="sap-textarea" rows="3" @bind-Value="nuevaResena.Comentario" placeholder="Escribe tu opinión sobre el videojuego..." />
+                        <ValidationMessage For="@(() => nuevaResena.Comentario)" />
                     </div>
-                </div>
-                <div class="fiori-form-group">
-                    <label class="sap-form-label">
-                        Comentario <span class="sap-form-required">*</span>
-                    </label>
-                    <textarea class="sap-textarea" rows="3" @bind="nuevaResenaComentario" placeholder="Escribe tu opinión sobre el videojuego..."></textarea>
-                </div>
-                <button class="btn-positive" @onclick="GuardarResena" disabled="@guardandoResena">
-                    @(guardandoResena ? "Guardando reseña..." : "Publicar reseña")
-                </button>
+
+                    <div style="margin-top:12px;">
+                        <button type="submit" class="btn-positive" disabled="@guardandoResena">
+                            @(guardandoResena ? "Guardando reseña..." : "Publicar reseña")
+                        </button>
+                    </div>
+                </EditForm>
             </div>
         </div>
     }
@@ -221,9 +232,7 @@
     private bool cargando = true;
     private string? mensajeError;
 
-    private string nuevaResenaAutor = string.Empty;
-    private int nuevaResenaCalificacion = 5;
-    private string nuevaResenaComentario = string.Empty;
+    private ResenaDto nuevaResena = new() { Calificacion = 5 };
     private bool guardandoResena = false;
     private string? mensajeResenaExito;
 
@@ -257,27 +266,19 @@
 
     private async Task GuardarResena()
     {
-        if (string.IsNullOrWhiteSpace(nuevaResenaAutor) || string.IsNullOrWhiteSpace(nuevaResenaComentario))
-        {
-            return;
-        }
-
         guardandoResena = true;
         mensajeResenaExito = null;
 
         try
         {
-            var resena = new ResenaDto
-            {
-                VideojuegoId = Id,
-                Autor = nuevaResenaAutor,
-                Calificacion = nuevaResenaCalificacion,
-                Comentario = nuevaResenaComentario
-            };
+            // Asegurar que el ID del videojuego esté presente
+            nuevaResena.VideojuegoId = Id;
 
-            await VideojuegoService.CrearResenaAsync(resena);
-            nuevaResenaAutor = string.Empty;
-            nuevaResenaComentario = string.Empty;
+            await VideojuegoService.CrearResenaAsync(nuevaResena);
+
+            // Reiniciar modelo del formulario (mantener calificación por defecto)
+            nuevaResena = new ResenaDto { Calificacion = 5 };
+
             mensajeResenaExito = "¡Reseña registrada con éxito!";
             await CargarDetalle();
         }
