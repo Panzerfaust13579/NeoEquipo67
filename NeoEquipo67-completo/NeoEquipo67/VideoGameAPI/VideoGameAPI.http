@@ -1,0 +1,85 @@
+@VideoGameAPI_HostAddress = http://localhost:5226
+
+### 1. Obtener todos los desarrolladores con sus videojuegos ($expand)
+GET {{VideoGameAPI_HostAddress}}/odata/Desarrolladores?$expand=Videojuegos
+Accept: application/json
+
+### 2. Filtrar desarrolladores por país ($filter)
+GET {{VideoGameAPI_HostAddress}}/odata/Desarrolladores?$filter=Pais eq 'Japón'
+Accept: application/json
+
+### 3. Obtener un desarrollador por Id
+GET {{VideoGameAPI_HostAddress}}/odata/Desarrolladores(1)?$expand=Videojuegos
+Accept: application/json
+
+### 4. Crear un nuevo desarrollador (POST)
+POST {{VideoGameAPI_HostAddress}}/odata/Desarrolladores
+Content-Type: application/json
+
+{
+  "Nombre": "Capcom",
+  "Pais": "Japón",
+  "AnioFundacion": 1979,
+  "SitioWeb": "https://www.capcom.com"
+}
+
+### 5. Obtener todos los videojuegos con Desarrollador y Reseñas ($expand)
+GET {{VideoGameAPI_HostAddress}}/odata/Videojuegos?$expand=Desarrollador,Resenas
+Accept: application/json
+
+### 6. Filtrar videojuegos por propiedad de navegación Desarrollador/Nombre ($filter)
+GET {{VideoGameAPI_HostAddress}}/odata/Videojuegos?$filter=Desarrollador/Nombre eq 'Nintendo EPD'&$expand=Desarrollador,Resenas
+Accept: application/json
+
+### 7. Filtrar videojuegos por precio ($filter)
+GET {{VideoGameAPI_HostAddress}}/odata/Videojuegos?$filter=Precio gt 20
+Accept: application/json
+
+### 8. Filtrar videojuegos por categoría ($filter)
+GET {{VideoGameAPI_HostAddress}}/odata/Videojuegos?$filter=Categoria eq 'RPG'
+Accept: application/json
+
+### 9. Obtener un videojuego por Id con Desarrollador y Reseñas ($expand)
+GET {{VideoGameAPI_HostAddress}}/odata/Videojuegos(1)?$expand=Desarrollador,Resenas
+Accept: application/json
+
+### 10. Crear un nuevo videojuego con DesarrolladorId válido (POST)
+POST {{VideoGameAPI_HostAddress}}/odata/Videojuegos
+Content-Type: application/json
+
+{
+  "Nombre": "Metroid Prime Remastered",
+  "Descripcion": "Una aventura de exploración y acción en primera persona en el planeta Tallon IV.",
+  "Precio": 39.99,
+  "Categoria": "Aventura",
+  "ImagenUrl": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+  "DesarrolladorId": 1
+}
+
+### 11. Intentar crear videojuego con DesarrolladorId inválido (debe responder 400 Bad Request)
+POST {{VideoGameAPI_HostAddress}}/odata/Videojuegos
+Content-Type: application/json
+
+{
+  "Nombre": "Juego Invalido",
+  "Descripcion": "Prueba de validacion de clave foranea inexistente.",
+  "Precio": 19.99,
+  "Categoria": "Acción",
+  "ImagenUrl": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600",
+  "DesarrolladorId": 9999
+}
+
+### 12. Crear una reseña para un videojuego (POST)
+POST {{VideoGameAPI_HostAddress}}/odata/Resenas
+Content-Type: application/json
+
+{
+  "VideojuegoId": 1,
+  "Calificacion": 5,
+  "Comentario": "Impresionante diseño de niveles y banda sonora.",
+  "Autor": "Ignacio R."
+}
+
+### 13. Obtener todas las reseñas
+GET {{VideoGameAPI_HostAddress}}/odata/Resenas
+Accept: application/json
