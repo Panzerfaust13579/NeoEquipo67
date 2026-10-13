@@ -1,0 +1,204 @@
+@page "/videojuego/nuevo"
+@inject VideojuegoService VideojuegoService
+@inject NavigationManager Navigation
+
+<div class="fiori-page" style="max-width: 860px;">
+    <!-- SAP Breadcrumb Component -->
+    <nav class="sap-breadcrumb" aria-label="Breadcrumb">
+        <a href="/" class="sap-breadcrumb-item">Inicio</a>
+        <span class="sap-breadcrumb-separator">/</span>
+        <span class="sap-breadcrumb-current">Nuevo videojuego</span>
+    </nav>
+
+    <!-- SAP Header Bar Component -->
+    <div class="fiori-header-bar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn-transparent" @onclick="Cancelar">
+                <span class="sap-icon sap-icon--nav-back" aria-hidden="true"></span> Volver al catálogo
+            </button>
+            <h1 class="fiori-header-title">Crear nuevo videojuego</h1>
+        </div>
+    </div>
+
+    <!-- Message Strip Component (Feedback States) -->
+    @if (!string.IsNullOrEmpty(mensajeConfirmacion))
+    {
+        <div class="sap-message-strip sap-message-strip--positive">
+            <span class="sap-icon sap-icon--message-success" aria-hidden="true"></span>
+            <span>@mensajeConfirmacion</span>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="sap-message-strip sap-message-strip--negative">
+            <span class="sap-icon sap-icon--message-warning" aria-hidden="true"></span>
+            <span>@mensajeError</span>
+        </div>
+    }
+
+    <!-- SAP Card / Form Component -->
+    <div class="sap-card">
+        <div class="sap-card-header">
+            <h3 class="sap-card-title">Información del videojuego</h3>
+            <span class="sap-badge sap-badge--information">Formulario OData</span>
+        </div>
+
+        <EditForm Model="modelo" OnValidSubmit="Guardar">
+            <DataAnnotationsValidator />
+
+            <div class="fiori-form-group">
+                <label class="sap-form-label">
+                    Nombre del videojuego <span class="sap-form-required">*</span>
+                </label>
+                <InputText class="sap-input" @bind-Value="modelo.Nombre" placeholder="Ej. Metroid Dread" />
+                <ValidationMessage For="@(() => modelo.Nombre)" class="sap-form-error" />
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="fiori-form-group">
+                    <label class="sap-form-label">
+                        Precio ($ USD) <span class="sap-form-required">*</span>
+                    </label>
+                    <InputNumber class="sap-input" @bind-Value="modelo.Precio" step="0.01" />
+                    <ValidationMessage For="@(() => modelo.Precio)" class="sap-form-error" />
+                </div>
+
+                <div class="fiori-form-group">
+                    <label class="sap-form-label">
+                        Categoría <span class="sap-form-required">*</span>
+                    </label>
+                    <InputSelect class="sap-select" @bind-Value="modelo.Categoria">
+                        <option value="">-- Selecciona una categoría --</option>
+                        <option value="RPG">RPG</option>
+                        <option value="Aventura">Aventura</option>
+                        <option value="Metroidvania">Metroidvania</option>
+                        <option value="Plataformas">Plataformas</option>
+                        <option value="Carreras">Carreras</option>
+                        <option value="Roguelike">Roguelike</option>
+                        <option value="Estrategia">Estrategia</option>
+                        <option value="Acción">Acción</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => modelo.Categoria)" class="sap-form-error" />
+                </div>
+            </div>
+
+            <div class="fiori-form-group">
+                <label class="sap-form-label">
+                    Desarrollador <span class="sap-form-required">*</span>
+                </label>
+                @if (cargandoDesarrolladores)
+                {
+                    <div style="display: flex; align-items: center; gap: 8px; color: var(--sapTextMutedColor);">
+                        <div class="sap-loading-spinner" style="width: 18px; height: 18px; border-width: 2px;"></div>
+                        <span>Cargando desarrolladores...</span>
+                    </div>
+                }
+                else
+                {
+                    <InputSelect class="sap-select" @bind-Value="modelo.DesarrolladorId">
+                        <option value="0">-- Selecciona un desarrollador --</option>
+                        @foreach (var dev in desarrolladores)
+                        {
+                            <option value="@dev.Id">@dev.Nombre (@dev.Pais)</option>
+                        }
+                    </InputSelect>
+                }
+                <ValidationMessage For="@(() => modelo.DesarrolladorId)" class="sap-form-error" />
+            </div>
+
+            <div class="fiori-form-group">
+                <label class="sap-form-label">
+                    URL de la portada / imagen
+                </label>
+                <InputText class="sap-input" @bind-Value="modelo.ImagenUrl" placeholder="https://ejemplo.com/portada.jpg" />
+                <ValidationMessage For="@(() => modelo.ImagenUrl)" class="sap-form-error" />
+            </div>
+
+            <div class="fiori-form-group">
+                <label class="sap-form-label">
+                    Descripción
+                </label>
+                <InputTextArea class="sap-textarea" rows="4" @bind-Value="modelo.Descripcion" placeholder="Describe brevemente la trama, jugabilidad y características del videojuego..." />
+                <ValidationMessage For="@(() => modelo.Descripcion)" class="sap-form-error" />
+            </div>
+
+            <!-- Action Buttons Footer -->
+            <hr class="sap-divider" />
+            <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center;">
+                <button type="button" class="btn-transparent" @onclick="Cancelar" disabled="@guardando">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-emphasized" disabled="@guardando">
+                    @(guardando ? "Guardando..." : "Guardar videojuego")
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private VideojuegoDto modelo = new()
+    {
+        Nombre = string.Empty,
+        Categoria = string.Empty,
+        Precio = 29.99m,
+        Descripcion = string.Empty,
+        ImagenUrl = "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600"
+    };
+
+    private bool guardando = false;
+    private string? mensajeConfirmacion;
+    private string? mensajeError;
+
+    private List<DesarrolladorDto> desarrolladores = new();
+    private bool cargandoDesarrolladores = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            desarrolladores = await VideojuegoService.GetDesarrolladoresAsync();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"No se pudieron cargar los desarrolladores: {ex.Message}";
+        }
+        finally
+        {
+            cargandoDesarrolladores = false;
+        }
+    }
+
+    private async Task Guardar()
+    {
+        guardando = true;
+        mensajeError = null;
+        mensajeConfirmacion = null;
+
+        try
+        {
+            var resultado = await VideojuegoService.CrearVideojuegoAsync(modelo);
+            if (resultado != null)
+            {
+                mensajeConfirmacion = $"¡Videojuego '{resultado.Nombre}' creado exitosamente mediante OData POST! Redirigiendo...";
+                StateHasChanged();
+                await Task.Delay(1400);
+                Navigation.NavigateTo("/");
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al registrar el videojuego en el servicio OData: {ex.Message}";
+        }
+        finally
+        {
+            guardando = false;
+        }
+    }
+
+    private void Cancelar()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

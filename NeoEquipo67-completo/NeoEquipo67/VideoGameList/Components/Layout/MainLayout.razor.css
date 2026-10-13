@@ -1,0 +1,9 @@
+.fiori-app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.fiori-main-content {
+    flex: 1;
+}

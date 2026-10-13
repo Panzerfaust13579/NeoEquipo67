@@ -1,0 +1,106 @@
+@inject NavigationManager Navigation
+
+<div class="sap-card detail-panel">
+    @if (Videojuego == null)
+    {
+        <div class="sap-empty-state">
+            <div class="sap-empty-state-icon"><span class="sap-icon sap-icon--product" aria-hidden="true"></span></div>
+            <h3 class="sap-empty-state-title">Ningún videojuego seleccionado</h3>
+            <p class="sap-empty-state-desc">Selecciona un elemento de la lista para consultar su detalle y reseñas asociadas.</p>
+        </div>
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(Videojuego.ImagenUrl))
+        {
+            <img src="@Videojuego.ImagenUrl" alt="@Videojuego.Nombre" class="detail-image" />
+        }
+
+        <h2 class="detail-title">@Videojuego.Nombre</h2>
+
+        <div class="master-item-meta" style="margin-bottom: 12px;">
+            <span class="sap-badge sap-badge--neutral">@Videojuego.Categoria</span>
+            <span class="sap-badge sap-badge--neutral"><span class="sap-icon sap-icon--building" aria-hidden="true"></span> @Videojuego.NombreDesarrollador</span>
+
+            @if (Videojuego.TotalResenas > 0)
+            {
+                var cal = Videojuego.CalificacionPromedio;
+                <div class="sap-rating-indicator">
+                    <span class="sap-badge @VideojuegoDto.ObtenerClaseCalificacion(cal)">
+                        <span class="sap-icon sap-icon--favorite" aria-hidden="true"></span> @cal.ToString("0.0")
+                    </span>
+                    <span class="sap-rating-count">(@Videojuego.TotalResenas)</span>
+                </div>
+            }
+            else
+            {
+                <span class="sap-badge sap-badge--neutral">Sin reseñas</span>
+            }
+
+            <span class="master-item-price" style="margin: 0; font-size: 16px;">
+                $@Videojuego.Precio.ToString("0.00")
+            </span>
+        </div>
+
+        <p class="detail-desc">@Videojuego.Descripcion</p>
+
+        @if (Videojuego.Desarrollador != null)
+        {
+            <p style="margin: 0 0 16px 0; color: var(--sapTextMutedColor); font-size: 13px;">
+                Desarrollado por <strong style="color: var(--sapTextColor);">@Videojuego.Desarrollador.Nombre</strong>
+                · @Videojuego.Desarrollador.Pais · fundado en @Videojuego.Desarrollador.AnioFundacion
+            </p>
+        }
+
+        <div style="margin-bottom: 16px;">
+            <button class="btn-emphasized" @onclick="VerDetalleCompleto">
+                Ver detalle completo
+            </button>
+        </div>
+
+        <hr class="sap-divider" />
+
+        <div class="sap-card-header" style="border: none; padding: 0; margin-bottom: 12px;">
+            <h4 class="sap-card-title" style="font-size: 15px;">Reseñas de usuarios (@Videojuego.TotalResenas)</h4>
+        </div>
+
+        @if (Videojuego.Resenas != null && Videojuego.Resenas.Any())
+        {
+            <div class="review-list">
+                @foreach (var resena in Videojuego.Resenas)
+                {
+                    var initial = string.IsNullOrWhiteSpace(resena.Autor) ? "U" : resena.Autor.Substring(0, 1).ToUpperInvariant();
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-user-info">
+                                <span class="sap-avatar">@initial</span>
+                                <span class="review-author">@resena.Autor</span>
+                            </div>
+                                <span class="sap-badge @VideojuegoDto.ObtenerClaseCalificacion(resena.Calificacion)"><span class="sap-icon sap-icon--favorite" aria-hidden="true"></span> @resena.Calificacion/5</span>
+                        </div>
+                        <p class="review-comment">@resena.Comentario</p>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p style="color: var(--sapTextMutedColor); font-style: italic; margin: 0; font-size: 13px;">
+                Este videojuego aún no cuenta con reseñas registradas.
+            </p>
+        }
+    }
+</div>
+
+@code {
+    [CascadingParameter(Name = "VideojuegoSeleccionado")]
+    public VideojuegoDto? Videojuego { get; set; }
+
+    private void VerDetalleCompleto()
+    {
+        if (Videojuego != null)
+        {
+            Navigation.NavigateTo($"/videojuego/{Videojuego.Id}");
+        }
+    }
+}
